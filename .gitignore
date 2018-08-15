@@ -21,3 +21,5 @@ Thumbs.db
 # other ignore
 src/main/resources/static
 /.apt_generated/
+.factorypath
+
