@@ -5,7 +5,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.syswin.temail</groupId>
-  <artifactId>cdtp-server</artifactId>
+  <!--
+  <artifactId>cdtp-server</artifactId>-->
+  <artifactId>temail-gateway</artifactId>
+  
   <version>1.0-SNAPSHOT</version>
 
   <packaging>jar</packaging>
