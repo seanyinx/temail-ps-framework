@@ -25,6 +25,7 @@
   </properties>
 
   <dependencies>
+
      <dependency>
       <groupId>com.systoon.integration</groupId>
       <artifactId>disconf-spring-boot-starter</artifactId>
