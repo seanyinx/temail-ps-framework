@@ -187,7 +187,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>com.syswin.temail.cdtpserver.TemailServerApplication</mainClass>
+              <mainClass>com.syswin.temail.gateway.TemailGatewayApplication</mainClass>
             </manifest>
           </archive>
         </configuration>
