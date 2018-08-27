@@ -27,7 +27,7 @@
 
   <dependencies>
 
-     <dependency>
+    <dependency>
       <groupId>com.systoon.integration</groupId>
       <artifactId>disconf-spring-boot-starter</artifactId>
       <version>1.0.0</version>
@@ -56,11 +56,11 @@
       <artifactId>log4j-over-slf4j</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-all</artifactId>
-      <scope>compile</scope>
-    </dependency>
+    <!--<dependency>-->
+    <!--<groupId>io.netty</groupId>-->
+    <!--<artifactId>netty-all</artifactId>-->
+    <!--<scope>compile</scope>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -93,6 +93,12 @@
       <groupId>org.apache.rocketmq</groupId>
       <artifactId>rocketmq-client</artifactId>
       <version>${rocketmq-client.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-all</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
