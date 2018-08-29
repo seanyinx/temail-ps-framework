@@ -277,14 +277,13 @@
     </plugins>
   </build>
 
-  <repositories>
+ <!-- <repositories>
     <repository>
       <id>systoon-public</id>
       <name>Repository for systoon-public</name>
       <url>http://maven.systoon.com/repository/public/</url>
     </repository>
   </repositories>
-  <!--部署管理 -->
   <distributionManagement>
     <repository>
       <id>nexus-releases</id>
@@ -296,6 +295,6 @@
       <name>Nexus Snapshots Repository</name>
       <url>http://maven.systoon.com/repository/snapshots/</url>
     </snapshotRepository>
-  </distributionManagement>
+  </distributionManagement>-->
 
 </project>
