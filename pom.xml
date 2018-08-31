@@ -52,14 +52,10 @@
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
     </dependency>
-    <dependency>  <!-- 支持识别yml配置 -->
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-yaml</artifactId>
-    </dependency>
-    <!--<dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>log4j-over-slf4j</artifactId>
-    </dependency>-->
+    </dependency>
 
 
     <dependency>
@@ -302,12 +298,12 @@
         <configuration>
           <layout>ZIP</layout>
           <executable>true</executable>
-          <includes>
-            <include>
-              <groupId>nothing</groupId>
-              <artifactId>nothing</artifactId>
-            </include>
-          </includes>
+          <!--<includes>-->
+            <!--<include>-->
+              <!--<groupId>nothing</groupId>-->
+              <!--<artifactId>nothing</artifactId>-->
+            <!--</include>-->
+          <!--</includes>-->
         </configuration>
         <dependencies>
           <!-- spring热部署 -->
