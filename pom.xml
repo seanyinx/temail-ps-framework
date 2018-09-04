@@ -199,6 +199,11 @@
         </exclusion>
       </exclusions>
     </dependency>
+      <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk15on</artifactId>
+      <version>1.54</version>
+    </dependency>
 
   </dependencies>
 
@@ -298,12 +303,12 @@
         <configuration>
           <layout>ZIP</layout>
           <executable>true</executable>
-          <!--<includes>-->
-            <!--<include>-->
-              <!--<groupId>nothing</groupId>-->
-              <!--<artifactId>nothing</artifactId>-->
-            <!--</include>-->
-          <!--</includes>-->
+          <includes>
+            <include>
+              <groupId>nothing</groupId>
+              <artifactId>nothing</artifactId>
+            </include>
+          </includes>
         </configuration>
         <dependencies>
           <!-- spring热部署 -->
@@ -321,6 +326,25 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/libs</outputDirectory>
+              <includeScope>compile</includeScope>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -353,7 +377,7 @@
     </plugins>
   </build>
 
-  <repositories>
+ <!-- <repositories>
     <repository>
       <id>systoon-public</id>
       <name>Repository for systoon-public</name>
@@ -371,6 +395,6 @@
       <name>Nexus Snapshots Repository</name>
       <url>http://maven.systoon.com/repository/snapshots/</url>
     </snapshotRepository>
-  </distributionManagement>
+  </distributionManagement>-->
 
 </project>
