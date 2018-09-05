@@ -24,11 +24,11 @@
   </properties>
 
   <dependencies>
-    <dependency>
+   <!-- <dependency>
       <groupId>com.syswin.temail</groupId>
       <artifactId>temail-channel-client</artifactId>
       <version>${temail-channel-client.version}</version>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>com.systoon.integration</groupId>
       <artifactId>disconf-spring-boot-starter</artifactId>
