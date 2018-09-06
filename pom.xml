@@ -24,11 +24,11 @@
   </properties>
 
   <dependencies>
-   <!-- <dependency>
+    <dependency>
       <groupId>com.syswin.temail</groupId>
       <artifactId>temail-channel-client</artifactId>
       <version>${temail-channel-client.version}</version>
-    </dependency>-->
+    </dependency>
     <dependency>
       <groupId>com.systoon.integration</groupId>
       <artifactId>disconf-spring-boot-starter</artifactId>
@@ -382,7 +382,7 @@
     </plugins>
   </build>
 
-  <!-- <repositories>
+   <repositories>
      <repository>
        <id>systoon-public</id>
        <name>Repository for systoon-public</name>
@@ -400,6 +400,6 @@
        <name>Nexus Snapshots Repository</name>
        <url>http://maven.systoon.com/repository/snapshots/</url>
      </snapshotRepository>
-   </distributionManagement>-->
+   </distributionManagement>
 
 </project>
