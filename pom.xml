@@ -20,10 +20,15 @@
     <rocketmq-client.version>4.3.0</rocketmq-client.version>
     <pact.version>3.5.20</pact.version>
     <zookeeper.version>3.3.6</zookeeper.version>
+    <temail-channel-client.version>1.0.0-SNAPSHOT</temail-channel-client.version>
   </properties>
 
   <dependencies>
-
+   <!-- <dependency>
+      <groupId>com.syswin.temail</groupId>
+      <artifactId>temail-channel-client</artifactId>
+      <version>${temail-channel-client.version}</version>
+    </dependency>-->
     <dependency>
       <groupId>com.systoon.integration</groupId>
       <artifactId>disconf-spring-boot-starter</artifactId>
@@ -48,7 +53,7 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-log4j2</artifactId>
     </dependency>
-        <dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
     </dependency>
@@ -199,7 +204,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-      <dependency>
+    <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk15on</artifactId>
       <version>1.54</version>
@@ -377,24 +382,24 @@
     </plugins>
   </build>
 
- <!-- <repositories>
-    <repository>
-      <id>systoon-public</id>
-      <name>Repository for systoon-public</name>
-      <url>http://maven.systoon.com/repository/public/</url>
-    </repository>
-  </repositories>
-  <distributionManagement>
-    <repository>
-      <id>nexus-releases</id>
-      <name>Nexus Releases Repository</name>
-      <url>http://maven.systoon.com/repository/releases/</url>
-    </repository>
-    <snapshotRepository>
-      <id>nexus-snapshots</id>
-      <name>Nexus Snapshots Repository</name>
-      <url>http://maven.systoon.com/repository/snapshots/</url>
-    </snapshotRepository>
-  </distributionManagement>-->
+  <!-- <repositories>
+     <repository>
+       <id>systoon-public</id>
+       <name>Repository for systoon-public</name>
+       <url>http://maven.systoon.com/repository/public/</url>
+     </repository>
+   </repositories>
+   <distributionManagement>
+     <repository>
+       <id>nexus-releases</id>
+       <name>Nexus Releases Repository</name>
+       <url>http://maven.systoon.com/repository/releases/</url>
+     </repository>
+     <snapshotRepository>
+       <id>nexus-snapshots</id>
+       <name>Nexus Snapshots Repository</name>
+       <url>http://maven.systoon.com/repository/snapshots/</url>
+     </snapshotRepository>
+   </distributionManagement>-->
 
 </project>
