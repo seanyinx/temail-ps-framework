@@ -1,7 +1,7 @@
 package com.syswin.temail.ps.server.handler;
 
 import static com.syswin.temail.ps.common.Constants.CDTP_VERSION;
-import static com.syswin.temail.ps.common.entity.CommandSpaceType.CHANNEL;
+import static com.syswin.temail.ps.common.entity.CommandSpaceType.CHANNEL_CODE;
 import static com.syswin.temail.ps.common.entity.CommandType.INTERNAL_ERROR;
 
 import com.syswin.temail.ps.common.entity.CDTPHeader;
@@ -35,7 +35,7 @@ public class ChannelExceptionHandler extends ChannelInboundHandlerAdapter {
         packet.setHeader(header);
         packet.setVersion(CDTP_VERSION);
       }
-      packet.setCommandSpace(CHANNEL.getCode());
+      packet.setCommandSpace(CHANNEL_CODE);
       packet.setCommand(INTERNAL_ERROR.getCode());
       CDTPServerError.Builder builder = CDTPServerError.newBuilder();
       builder.setCode(INTERNAL_ERROR.getCode());

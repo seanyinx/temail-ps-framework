@@ -1,6 +1,6 @@
 package com.syswin.temail.ps.server.handler;
 
-import static com.syswin.temail.ps.common.entity.CommandSpaceType.CHANNEL;
+import static com.syswin.temail.ps.common.entity.CommandSpaceType.CHANNEL_CODE;
 import static com.syswin.temail.ps.common.entity.CommandType.LOGIN;
 import static com.syswin.temail.ps.common.entity.CommandType.LOGOUT;
 import static com.syswin.temail.ps.common.entity.CommandType.PING;
@@ -44,7 +44,7 @@ public class TemailGatewayHandler extends SimpleChannelInboundHandler<CDTPPacket
   public void channelRead0(ChannelHandlerContext ctx, CDTPPacket packet) {
     try {
       Channel channel = ctx.channel();
-      if (packet.getCommandSpace() == CHANNEL.getCode()) {
+      if (packet.getCommandSpace() == CHANNEL_CODE) {
         if (packet.getCommand() == PING.getCode()) {
           heartBeatService.pong(channel, packet);
         } else if (packet.getCommand() == LOGIN.getCode()) {
