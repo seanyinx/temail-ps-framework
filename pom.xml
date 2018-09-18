@@ -4,13 +4,20 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.0.4.RELEASE</version>
+  </parent>
+
   <groupId>com.syswin.temail</groupId>
-  <artifactId>temail-gateway</artifactId>
+  <artifactId>temail-gateway-parent</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <modules>
-    <module>gateway-core</module>
-    <module>gateway-service</module>
-    <module>gateway-spring</module>
+    <module>ps-common</module>
+    <module>ps-client</module>
+    <module>ps-server</module>
+    <module>temail-gateway</module>
   </modules>
   <packaging>pom</packaging>
 
@@ -90,6 +97,13 @@
         <optional>true</optional>
         <version>1.16.22</version>
       </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk15on</artifactId>
+        <version>1.54</version>
+      </dependency>
+
+
 
       <dependency>
         <groupId>com.github.tomakehurst</groupId>
@@ -178,11 +192,6 @@
       <artifactId>unit-scaffolding</artifactId>
       <version>1.0.0</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15on</artifactId>
-      <version>1.54</version>
     </dependency>
 
   </dependencies>
@@ -301,4 +310,7 @@
        <url>http://maven.systoon.com/repository/public/</url>
      </repository>
    </repositories>
+  <distributionManagement>
+
+  </distributionManagement>
 </project>
