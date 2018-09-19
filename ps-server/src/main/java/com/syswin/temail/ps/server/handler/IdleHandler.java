@@ -1,13 +1,10 @@
 package com.syswin.temail.ps.server.handler;
 
-import com.syswin.temail.ps.server.entity.Session;
-import com.syswin.temail.ps.server.service.ChannelCollector;
-import com.syswin.temail.ps.server.service.SessionHandler;
+import com.syswin.temail.ps.server.service.SessionService;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleUserEventChannelHandler;
 import io.netty.handler.timeout.IdleStateEvent;
-import java.util.Collection;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -18,24 +15,20 @@ import lombok.extern.slf4j.Slf4j;
 @Sharable
 public class IdleHandler extends SimpleUserEventChannelHandler<IdleStateEvent> {
 
-  private final SessionHandler sessionService;
-  private final ChannelCollector channelCollector;
+  private final SessionService sessionService;
 
-  public IdleHandler(SessionHandler sessionService, ChannelCollector channelCollector) {
+  public IdleHandler(SessionService sessionService) {
     this.sessionService = sessionService;
-    this.channelCollector = channelCollector;
   }
 
   @Override
   protected void eventReceived(ChannelHandlerContext ctx, IdleStateEvent evt) {
-    Collection<Session> sessions = channelCollector.removeChannel(ctx.channel());
-    sessionService.disconnect(sessions);
+    sessionService.disconnect(ctx.channel());
   }
 
   @Override
   public void channelInactive(ChannelHandlerContext ctx) {
-    Collection<Session> sessions = channelCollector.removeChannel(ctx.channel());
-    sessionService.disconnect(sessions);
+    sessionService.disconnect(ctx.channel());
   }
 
 }

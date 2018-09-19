@@ -1,17 +1,15 @@
 package com.syswin.temail.ps.server.connection;
 
 import com.syswin.temail.ps.common.Constants;
-import com.syswin.temail.ps.server.handler.ChannelExceptionHandler;
-import com.syswin.temail.ps.server.handler.IdleHandler;
-import com.syswin.temail.ps.server.handler.TemailGatewayHandler;
-import com.syswin.temail.ps.server.service.ChannelHolder;
-import com.syswin.temail.ps.server.service.HeartBeatService;
-import com.syswin.temail.ps.server.service.RequestHandler;
-import com.syswin.temail.ps.server.service.SessionHandler;
 import com.syswin.temail.ps.common.codec.BodyExtractor;
 import com.syswin.temail.ps.common.codec.PacketDecoder;
 import com.syswin.temail.ps.common.codec.PacketEncoder;
 import com.syswin.temail.ps.common.codec.SimpleBodyExtractor;
+import com.syswin.temail.ps.server.handler.IdleHandler;
+import com.syswin.temail.ps.server.handler.PsServerHandler;
+import com.syswin.temail.ps.server.service.HeartBeatService;
+import com.syswin.temail.ps.server.service.RequestService;
+import com.syswin.temail.ps.server.service.SessionService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -26,55 +24,19 @@ import java.net.InetSocketAddress;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TemailGatewayServer {
+public class PsServer {
 
   private final IdleHandler idleHandler;
-  private final TemailGatewayHandler temailGatewayHandler;
-  private final ChannelExceptionHandler channelExceptionHandler;
+  private final PsServerHandler psServerHandler;
   private final BodyExtractor bodyExtractor;
-  private final ChannelHolder channelHolder;
 
-  public TemailGatewayServer(SessionHandler sessionHandler, RequestHandler requestHandler) {
-    this(sessionHandler, requestHandler, new ChannelHolder());
+  public PsServer(SessionService sessionService, RequestService requestService) {
+    this(sessionService, requestService, new SimpleBodyExtractor());
   }
 
-  public TemailGatewayServer(SessionHandler sessionHandler, RequestHandler requestHandler,
-      BodyExtractor bodyExtractor) {
-    this(sessionHandler, requestHandler, bodyExtractor, new ChannelHolder());
-  }
-
-  private TemailGatewayServer(SessionHandler sessionHandler, RequestHandler requestHandler,
-      ChannelHolder channelHolder) {
-    this(new TemailGatewayHandler(sessionHandler, requestHandler, new HeartBeatService(), channelHolder),
-        new ChannelExceptionHandler(),
-        new SimpleBodyExtractor(),
-        sessionHandler,
-        channelHolder);
-  }
-
-  private TemailGatewayServer(
-      SessionHandler sessionHandler,
-      RequestHandler requestHandler,
-      BodyExtractor bodyExtractor,
-      ChannelHolder channelHolder) {
-
-    this(new TemailGatewayHandler(sessionHandler, requestHandler, new HeartBeatService(), channelHolder),
-        new ChannelExceptionHandler(),
-        bodyExtractor,
-        sessionHandler,
-        channelHolder);
-  }
-
-  private TemailGatewayServer(
-      TemailGatewayHandler temailGatewayHandler,
-      ChannelExceptionHandler channelExceptionHandler,
-      BodyExtractor bodyExtractor,
-      SessionHandler sessionHandler,
-      ChannelHolder channelHolder) {
-    this.channelHolder = channelHolder;
-    this.idleHandler = new IdleHandler(sessionHandler, channelHolder);
-    this.temailGatewayHandler = temailGatewayHandler;
-    this.channelExceptionHandler = channelExceptionHandler;
+  public PsServer(SessionService sessionService, RequestService requestService, BodyExtractor bodyExtractor) {
+    this.idleHandler = new IdleHandler(sessionService);
+    this.psServerHandler = new PsServerHandler(sessionService, requestService, new HeartBeatService());
     this.bodyExtractor = bodyExtractor;
   }
 
@@ -105,8 +67,7 @@ public class TemailGatewayServer {
                     new LengthFieldPrepender(Constants.LENGTH_FIELD_LENGTH, 0, false))
                 .addLast("packetDecoder", new PacketDecoder(bodyExtractor))
                 .addLast("packetEncoder", new PacketEncoder())
-                .addLast("temailGatewayHandler", temailGatewayHandler)
-                .addLast("channelExceptionHandler", channelExceptionHandler);
+                .addLast("psServerHandler", psServerHandler);
           }
         });
 
@@ -115,7 +76,4 @@ public class TemailGatewayServer {
     log.info("Temail 服务器已启动,端口号：{}", port);
   }
 
-  public ChannelHolder channelHolder() {
-    return channelHolder;
-  }
 }
