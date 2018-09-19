@@ -18,30 +18,35 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2018-9-19
  */
 @Slf4j
-public class AbstractSessionService implements SessionService {
+public abstract class AbstractSessionService implements SessionService {
 
   @Getter
   private final ChannelHolder channelHolder = new ChannelHolder();
 
-  protected boolean realLogin(CDTPPacket reqPacket, CDTPPacket respPacket) {
+  protected boolean isLoggedInExt(CDTPPacket packet) {
     return true;
   }
 
-  protected boolean realLogout(CDTPPacket reqPacket, CDTPPacket respPacket) {
+  protected boolean loginExt(CDTPPacket reqPacket, CDTPPacket respPacket) {
     return true;
   }
 
-  protected void removeSessions(Collection<Session> sessions) {
+  protected boolean logoutExt(CDTPPacket reqPacket, CDTPPacket respPacket) {
+    return true;
+  }
+
+  protected void disconnectExt(Collection<Session> sessions) {
   }
 
   @Override
   public boolean isLoggedIn(Channel channel, CDTPPacket packet) {
     String temail = packet.getHeader().getSender();
     String deviceId = packet.getHeader().getDeviceId();
-    if (!authSession(channel, temail, deviceId)) {
+    if (!authSession(channel, temail, deviceId) ||
+        !isLoggedInExt(packet)) {
       CDTPPacket errorPacket = errorPacket(packet, INTERNAL_ERROR.getCode(),
           "用户" + temail + "在设备" + deviceId + "上没有登录，无法进行操作！");
-      channel.writeAndFlush(errorPacket);
+      channel.writeAndFlush(errorPacket).syncUninterruptibly();
       return false;
     }
     return true;
@@ -51,11 +56,11 @@ public class AbstractSessionService implements SessionService {
   public void login(Channel channel, CDTPPacket reqPacket) {
     CDTPHeader header = reqPacket.getHeader();
     CDTPPacket respPacket = new CDTPPacket(reqPacket);
-    if (realLogin(reqPacket, respPacket)) {
+    if (loginExt(reqPacket, respPacket)) {
       channelHolder.addSession(header.getSender(), header.getDeviceId(), channel);
-      channel.writeAndFlush(respPacket);
+      channel.writeAndFlush(respPacket).syncUninterruptibly();
     } else {
-      channel.writeAndFlush(respPacket);
+      channel.writeAndFlush(respPacket).syncUninterruptibly();
       if (channelHolder.hasNoSession(channel)) {
         log.debug("连接关闭前的请求堆栈信息", new RuntimeException(channel.toString()));
         channel.close();
@@ -67,8 +72,8 @@ public class AbstractSessionService implements SessionService {
   public void logout(Channel channel, CDTPPacket reqPacket) {
     CDTPHeader header = reqPacket.getHeader();
     CDTPPacket respPacket = new CDTPPacket(reqPacket);
-    if (realLogout(reqPacket, respPacket)) {
-      channel.writeAndFlush(reqPacket);
+    if (logoutExt(reqPacket, respPacket)) {
+      channel.writeAndFlush(reqPacket).syncUninterruptibly();
       channelHolder.removeSession(header.getSender(), header.getDeviceId(), channel);
     }
   }
@@ -76,7 +81,7 @@ public class AbstractSessionService implements SessionService {
   @Override
   public void disconnect(Channel channel) {
     Collection<Session> sessions = channelHolder.removeChannel(channel);
-    removeSessions(sessions);
+    disconnectExt(sessions);
   }
 
   private CDTPPacket errorPacket(CDTPPacket packet, int code, String message) {

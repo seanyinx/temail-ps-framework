@@ -56,7 +56,8 @@ public class PsServerHandler extends SimpleChannelInboundHandler<CDTPPacket> {
         }
       } else {
         if (sessionService.isLoggedIn(channel, packet)) {
-          requestService.handleRequest(packet, channel::writeAndFlush);
+          requestService.handleRequest(packet,
+              respPacket -> channel.writeAndFlush(respPacket).syncUninterruptibly());
         }
       }
     } catch (Exception e) {
@@ -86,7 +87,7 @@ public class PsServerHandler extends SimpleChannelInboundHandler<CDTPPacket> {
         builder.setDesc(cause.getMessage());
       }
       packet.setData(builder.build().toByteArray());
-      ctx.channel().writeAndFlush(packet);
+      ctx.channel().writeAndFlush(packet).syncUninterruptibly();
     }
   }
 }
