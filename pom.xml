@@ -28,26 +28,28 @@
     <zookeeper.version>3.3.6</zookeeper.version>
     <temail-channel-registry-client.version>1.0.0-SNAPSHOT</temail-channel-registry-client.version>
     <spring.boot.version>2.0.4.RELEASE</spring.boot.version>
+    <ps.version>1.0.0-SNAPSHOT</ps.version>
+    <awaitility.version>3.0.0</awaitility.version>
+    <unit-scaffolding.version>1.0.0</unit-scaffolding.version>
+    <netty.version>4.1.27.Final</netty.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>com.syswin.temail</groupId>
-        <artifactId>gateway-core</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <artifactId>ps-common</artifactId>
+        <version>${ps.version}</version>
       </dependency>
       <dependency>
         <groupId>com.syswin.temail</groupId>
-        <artifactId>gateway-service</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <artifactId>ps-server</artifactId>
+        <version>${ps.version}</version>
       </dependency>
       <dependency>
         <groupId>com.syswin.temail</groupId>
-        <artifactId>gateway-service</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-        <type>test-jar</type>
-        <scope>test</scope>
+        <artifactId>ps-client</artifactId>
+        <version>${ps.version}</version>
       </dependency>
 
       <dependency>
@@ -68,19 +70,9 @@
       <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-all</artifactId>
-        <version>4.1.27.Final</version>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>1.7.25</version>
+        <version>${netty.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>com.google.code.gson</groupId>
-        <artifactId>gson</artifactId>
-        <version>2.8.5</version>
-      </dependency>
       <dependency>
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
@@ -91,19 +83,6 @@
         <artifactId>rocketmq-client</artifactId>
         <version>${rocketmq-client.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-        <optional>true</optional>
-        <version>1.16.22</version>
-      </dependency>
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk15on</artifactId>
-        <version>1.54</version>
-      </dependency>
-
-
 
       <dependency>
         <groupId>com.github.tomakehurst</groupId>
@@ -126,7 +105,7 @@
       <dependency>
         <groupId>com.github.seanyinx</groupId>
         <artifactId>unit-scaffolding</artifactId>
-        <version>1.0.0</version>
+        <version>${unit-scaffolding.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -159,46 +138,49 @@
         <version>${pact.version}</version>
         <scope>test</scope>
       </dependency>
+      <dependency>
+        <groupId>org.awaitility</groupId>
+        <artifactId>awaitility</artifactId>
+        <version>${awaitility.version}</version>
+        <scope>test</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>2.18.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.10.0</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.awaitility</groupId>
-      <artifactId>awaitility</artifactId>
-      <version>3.0.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.github.seanyinx</groupId>
-      <artifactId>unit-scaffolding</artifactId>
-      <version>1.0.0</version>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
-
   <build>
-    <finalName>${project.artifactId}</finalName>
     <resources>
       <resource>
         <directory>${basedir}/src/main/resources</directory>
@@ -209,16 +191,6 @@
           <include>**/*.yaml</include>
           <include>**/*.xml</include>
         </includes>
-      </resource>
-      <resource>
-        <directory>${basedir}/src/main/resources</directory>
-        <filtering>false</filtering>
-        <excludes>
-          <exclude>**/*.properties</exclude>
-          <exclude>**/*.yml</exclude>
-          <exclude>**/*.yaml</exclude>
-          <exclude>**/*.xml</exclude>
-        </excludes>
       </resource>
     </resources>
     <testResources>
@@ -232,85 +204,26 @@
           <include>**/*.xml</include>
         </includes>
       </testResource>
-      <testResource>
-        <directory>${basedir}/src/test/resources</directory>
-        <filtering>false</filtering>
-        <excludes>
-          <exclude>**/*.properties</exclude>
-          <exclude>**/*.yml</exclude>
-          <exclude>**/*.yaml</exclude>
-          <exclude>**/*.xml</exclude>
-        </excludes>
-      </testResource>
     </testResources>
-
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/libs</outputDirectory>
-              <includeScope>compile</includeScope>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>com.syswin.temail.gateway.TemailGatewayApplication</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>au.com.dius</groupId>
-        <artifactId>pact-jvm-provider-maven_2.12</artifactId>
-        <version>${pact.version}</version>
-        <configuration>
-          <pactDirectory>target/pacts</pactDirectory>
-          <pactBrokerUrl>http://172.28.50.206:88/</pactBrokerUrl>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>publish</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
   </build>
 
-   <repositories>
-     <repository>
-       <id>systoon-public</id>
-       <name>Repository for systoon-public</name>
-       <url>http://maven.systoon.com/repository/public/</url>
-     </repository>
-   </repositories>
+  <repositories>
+    <repository>
+      <id>systoon-public</id>
+      <name>Repository for systoon-public</name>
+      <url>http://maven.systoon.com/repository/public/</url>
+    </repository>
+  </repositories>
   <distributionManagement>
-
+    <repository>
+      <id>nexus-releases</id>
+      <name>Nexus Releases Repository</name>
+      <url>http://maven.systoon.com/repository/releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>nexus-snapshots</id>
+      <name>Nexus Snapshots Repository</name>
+      <url>http://maven.systoon.com/repository/snapshots/</url>
+    </snapshotRepository>
   </distributionManagement>
 </project>
