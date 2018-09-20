@@ -5,8 +5,11 @@ import static com.syswin.temail.ps.common.entity.CommandType.INTERNAL_ERROR;
 
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
+import com.syswin.temail.ps.common.entity.CDTPProtoBuf.CDTPLoginResp;
+import com.syswin.temail.ps.common.entity.CDTPProtoBuf.CDTPLogoutResp;
 import com.syswin.temail.ps.common.entity.CDTPProtoBuf.CDTPServerError;
 import com.syswin.temail.ps.common.entity.CDTPProtoBuf.CDTPServerError.Builder;
+import com.syswin.temail.ps.server.Constants;
 import com.syswin.temail.ps.server.entity.Session;
 import io.netty.channel.Channel;
 import java.util.Collection;
@@ -28,11 +31,16 @@ public abstract class AbstractSessionService implements SessionService {
   }
 
   protected boolean loginExt(CDTPPacket reqPacket, CDTPPacket respPacket) {
+    CDTPLoginResp.Builder builder = CDTPLoginResp.newBuilder();
+    builder.setCode(Constants.HTTP_STATUS_OK);
+    respPacket.setData(builder.build().toByteArray());
     return true;
   }
 
-  protected boolean logoutExt(CDTPPacket reqPacket, CDTPPacket respPacket) {
-    return true;
+  protected void logoutExt(CDTPPacket reqPacket, CDTPPacket respPacket) {
+    CDTPLogoutResp.Builder builder = CDTPLogoutResp.newBuilder();
+    builder.setCode(Constants.HTTP_STATUS_OK);
+    respPacket.setData(builder.build().toByteArray());
   }
 
   protected void disconnectExt(Collection<Session> sessions) {
@@ -72,10 +80,9 @@ public abstract class AbstractSessionService implements SessionService {
   public void logout(Channel channel, CDTPPacket reqPacket) {
     CDTPHeader header = reqPacket.getHeader();
     CDTPPacket respPacket = new CDTPPacket(reqPacket);
-    if (logoutExt(reqPacket, respPacket)) {
-      channel.writeAndFlush(reqPacket).syncUninterruptibly();
-      channelHolder.removeSession(header.getSender(), header.getDeviceId(), channel);
-    }
+    logoutExt(reqPacket, respPacket);
+    channel.writeAndFlush(reqPacket).syncUninterruptibly();
+    channelHolder.removeSession(header.getSender(), header.getDeviceId(), channel);
   }
 
   @Override
