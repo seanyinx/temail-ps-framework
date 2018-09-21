@@ -1,4 +1,4 @@
-package com.syswin.temail.ps.server.connection;
+package com.syswin.temail.ps.server;
 
 import com.syswin.temail.ps.common.Constants;
 import com.syswin.temail.ps.common.codec.BodyExtractor;
@@ -29,18 +29,23 @@ public class PsServer {
   private final IdleHandler idleHandler;
   private final PsServerHandler psServerHandler;
   private final BodyExtractor bodyExtractor;
+  private final int port;
+  private final int readIdleTimeSeconds;
 
-  public PsServer(SessionService sessionService, RequestService requestService) {
-    this(sessionService, requestService, new SimpleBodyExtractor());
+  public PsServer(SessionService sessionService, RequestService requestService, int port, int readIdleTimeSeconds) {
+    this(sessionService, requestService, port, readIdleTimeSeconds, new SimpleBodyExtractor());
   }
 
-  public PsServer(SessionService sessionService, RequestService requestService, BodyExtractor bodyExtractor) {
+  public PsServer(SessionService sessionService, RequestService requestService, int port,
+      int readIdleTimeSeconds, BodyExtractor bodyExtractor) {
     this.idleHandler = new IdleHandler(sessionService);
+    this.port = port;
+    this.readIdleTimeSeconds = readIdleTimeSeconds;
     this.psServerHandler = new PsServerHandler(sessionService, requestService, new HeartBeatService());
     this.bodyExtractor = bodyExtractor;
   }
 
-  public void run(int port, final int readIdleTimeSeconds) {
+  public void run() {
     EventLoopGroup bossGroup = new NioEventLoopGroup(1);
     EventLoopGroup workerGroup = new NioEventLoopGroup();// 默认 cup
 
