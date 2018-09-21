@@ -23,6 +23,41 @@ import io.netty.handler.timeout.IdleStateHandler;
 import java.net.InetSocketAddress;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * <H1>PsServer服务器对象</H1>
+ * 为了构建PsServer，需要实现SessionService和RequestService接口。 其中：
+ * <ul>
+ * <li>SessionService已经提供了实现基本会话管理功能的AbstractSessionService类，
+ * 只要在这个类的基础上重载相应的ext方法即可。</li>
+ * <li>RequestService是实际的业务处理是接口，接口处理完成后，必须调用responseHandler将响应返回客户端。</li>
+ * <ul/>
+ * <p>
+ * 构建完PsServer实例，调用run方法即可将PsServer启动起来。<br>
+ * <H1>使用示例</H1>
+ * <pre>
+ * class TestSessionService extends AbstractSessionService {}
+ * class TestRequestService implements RequestService {
+ *
+ *     private TestRequestHandler handler;
+ *
+ *     TestRequestService(TestRequestHandler handler) {
+ *         this.handler = handler;
+ *     }
+ *
+ *     public void handleRequest(CDTPPacket reqPacket, Consumer<CDTPPacket> responseHandler) {
+ *         responseHandler.accept(handler.dispatch(reqPacket));
+ *     }
+ * }
+ * public void startServer() {
+ *     PsServer psServer =
+ *         new PsServer(
+ *             new TestSessionService(),
+ *             new TestRequestService(testRequestHandler),
+ *             serverPort, serverReadIdleTimeSeconds);
+ *     psServer.run();
+ * }
+ * </pre>
+ */
 @Slf4j
 public class PsServer {
 
@@ -30,17 +65,17 @@ public class PsServer {
   private final PsServerHandler psServerHandler;
   private final BodyExtractor bodyExtractor;
   private final int port;
-  private final int readIdleTimeSeconds;
+  private final int idleTimeSeconds;
 
-  public PsServer(SessionService sessionService, RequestService requestService, int port, int readIdleTimeSeconds) {
-    this(sessionService, requestService, port, readIdleTimeSeconds, new SimpleBodyExtractor());
+  public PsServer(SessionService sessionService, RequestService requestService, int port, int idleTimeSeconds) {
+    this(sessionService, requestService, port, idleTimeSeconds, new SimpleBodyExtractor());
   }
 
   public PsServer(SessionService sessionService, RequestService requestService, int port,
-      int readIdleTimeSeconds, BodyExtractor bodyExtractor) {
+      int idleTimeSeconds, BodyExtractor bodyExtractor) {
     this.idleHandler = new IdleHandler(sessionService);
     this.port = port;
-    this.readIdleTimeSeconds = readIdleTimeSeconds;
+    this.idleTimeSeconds = idleTimeSeconds;
     this.psServerHandler = new PsServerHandler(sessionService, requestService, new HeartBeatService());
     this.bodyExtractor = bodyExtractor;
   }
@@ -64,7 +99,7 @@ public class PsServer {
           @Override
           protected void initChannel(SocketChannel channel) {
             channel.pipeline()
-                .addLast("idleStateHandler", new IdleStateHandler(readIdleTimeSeconds, 0, 0))
+                .addLast("idleStateHandler", new IdleStateHandler(idleTimeSeconds, 0, 0))
                 .addLast("idleHandler", idleHandler)
                 .addLast("lengthFieldBasedFrameDecoder",
                     new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, Constants.LENGTH_FIELD_LENGTH, 0, 0))
