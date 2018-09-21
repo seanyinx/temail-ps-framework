@@ -54,7 +54,7 @@ public abstract class AbstractSessionService implements SessionService {
         !isLoggedInExt(packet)) {
       CDTPPacket errorPacket = errorPacket(packet, INTERNAL_ERROR.getCode(),
           "用户" + temail + "在设备" + deviceId + "上没有登录，无法进行操作！");
-      channel.writeAndFlush(errorPacket).syncUninterruptibly();
+      channel.writeAndFlush(errorPacket);
       return false;
     }
     return true;
@@ -66,9 +66,9 @@ public abstract class AbstractSessionService implements SessionService {
     CDTPPacket respPacket = new CDTPPacket(reqPacket);
     if (loginExt(reqPacket, respPacket)) {
       channelHolder.addSession(header.getSender(), header.getDeviceId(), channel);
-      channel.writeAndFlush(respPacket).syncUninterruptibly();
+      channel.writeAndFlush(respPacket);
     } else {
-      channel.writeAndFlush(respPacket).syncUninterruptibly();
+      channel.writeAndFlush(respPacket);
       if (channelHolder.hasNoSession(channel)) {
         log.debug("连接关闭前的请求堆栈信息", new RuntimeException(channel.toString()));
         channel.close();
@@ -81,7 +81,7 @@ public abstract class AbstractSessionService implements SessionService {
     CDTPHeader header = reqPacket.getHeader();
     CDTPPacket respPacket = new CDTPPacket(reqPacket);
     logoutExt(reqPacket, respPacket);
-    channel.writeAndFlush(reqPacket).syncUninterruptibly();
+    channel.writeAndFlush(reqPacket);
     channelHolder.removeSession(header.getSender(), header.getDeviceId(), channel);
   }
 

@@ -9,6 +9,6 @@ public class HeartBeatService {
 
   public void pong(Channel channel, CDTPPacket packet) {
     packet.setCommand(PONG.getCode());
-    channel.writeAndFlush(packet).syncUninterruptibly();
+    channel.writeAndFlush(packet);
   }
 }
