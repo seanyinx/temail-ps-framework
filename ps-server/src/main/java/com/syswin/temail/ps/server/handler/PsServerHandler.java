@@ -56,8 +56,7 @@ public class PsServerHandler extends SimpleChannelInboundHandler<CDTPPacket> {
         }
       } else {
         if (sessionService.isLoggedIn(channel, packet)) {
-          requestService.handleRequest(packet,
-              respPacket -> channel.writeAndFlush(respPacket));
+          requestService.handleRequest(packet, channel::writeAndFlush);
         }
       }
     } catch (Exception e) {
