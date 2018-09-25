@@ -81,7 +81,7 @@ public abstract class AbstractSessionService implements SessionService {
     CDTPHeader header = reqPacket.getHeader();
     CDTPPacket respPacket = new CDTPPacket(reqPacket);
     logoutExt(reqPacket, respPacket);
-    channel.writeAndFlush(reqPacket);
+    channel.writeAndFlush(respPacket);
     channelHolder.removeSession(header.getSender(), header.getDeviceId(), channel);
   }
 
