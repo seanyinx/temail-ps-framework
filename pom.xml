@@ -192,6 +192,16 @@
           <include>**/*.xml</include>
         </includes>
       </resource>
+      <resource>
+        <directory>${basedir}/src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/*.properties</exclude>
+          <exclude>**/*.yml</exclude>
+          <exclude>**/*.yaml</exclude>
+          <exclude>**/*.xml</exclude>
+        </excludes>
+      </resource>
     </resources>
     <testResources>
       <testResource>
@@ -203,6 +213,16 @@
           <include>**/*.yaml</include>
           <include>**/*.xml</include>
         </includes>
+      </testResource>
+      <testResource>
+        <directory>${basedir}/src/test/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/*.properties</exclude>
+          <exclude>**/*.yml</exclude>
+          <exclude>**/*.yaml</exclude>
+          <exclude>**/*.xml</exclude>
+        </excludes>
       </testResource>
     </testResources>
   </build>
