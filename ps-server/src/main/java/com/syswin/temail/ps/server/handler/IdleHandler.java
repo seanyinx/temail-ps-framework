@@ -4,6 +4,7 @@ import com.syswin.temail.ps.server.service.SessionService;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleUserEventChannelHandler;
+import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,7 +24,9 @@ public class IdleHandler extends SimpleUserEventChannelHandler<IdleStateEvent> {
 
   @Override
   protected void eventReceived(ChannelHandlerContext ctx, IdleStateEvent evt) {
-    sessionService.disconnect(ctx.channel());
+    if (evt.state() == IdleState.READER_IDLE) {
+      sessionService.disconnect(ctx.channel());
+    }
   }
 
   @Override

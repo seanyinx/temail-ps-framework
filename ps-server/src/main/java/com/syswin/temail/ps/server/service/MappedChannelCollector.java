@@ -32,15 +32,12 @@ class MappedChannelCollector implements ChannelCollector {
     sessions.removeIf(session -> temail.equals(session.getTemail()) && deviceId.equals(session.getDeviceId()));
     if (sessions.isEmpty()) {
       channelSessionMap.remove(channel);
-      log.debug("连接关闭前的请求堆栈信息", new RuntimeException(channel.toString()));
-      channel.close();
     }
   }
 
   @Override
   public Collection<Session> removeChannel(Channel channel) {
     Collection<Session> sessions = channelSessionMap.remove(channel);
-    channel.close();
     return sessions == null ? Collections.emptyList() : sessions;
   }
 }

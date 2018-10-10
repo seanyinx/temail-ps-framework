@@ -2,6 +2,7 @@ package com.syswin.temail.ps.server.service;
 
 import static com.syswin.temail.ps.common.entity.CommandSpaceType.CHANNEL_CODE;
 import static com.syswin.temail.ps.common.entity.CommandType.INTERNAL_ERROR;
+import static com.syswin.temail.ps.common.utils.SignatureUtil.resetSignature;
 
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
@@ -26,61 +27,88 @@ public abstract class AbstractSessionService implements SessionService {
   @Getter
   private final ChannelHolder channelHolder = new ChannelHolder();
 
+  /**
+   * 判断发起请求的用户是否登录的扩展接口
+   *
+   * @param packet 请求数据包
+   * @return 是否登录
+   * @deprecated 请求不再进行是否登录的判断
+   */
+//   * 而是使用{@link #bind(Channel, CDTPPacket)}进行处理：
+//   * 如果没有建立会话，则自动建立会话；如果已经建立会话则什么都不做
+  @Deprecated
   protected boolean isLoggedInExt(CDTPPacket packet) {
     return true;
   }
 
-  protected boolean loginExt(CDTPPacket reqPacket, CDTPPacket respPacket) {
+  protected boolean loginExt(CDTPPacket packet, CDTPPacket respPacket) {
     CDTPLoginResp.Builder builder = CDTPLoginResp.newBuilder();
     builder.setCode(Constants.HTTP_STATUS_OK);
     respPacket.setData(builder.build().toByteArray());
+    resetSignature(respPacket);
     return true;
   }
 
-  protected void logoutExt(CDTPPacket reqPacket, CDTPPacket respPacket) {
+  protected void logoutExt(CDTPPacket packet, CDTPPacket respPacket) {
     CDTPLogoutResp.Builder builder = CDTPLogoutResp.newBuilder();
     builder.setCode(Constants.HTTP_STATUS_OK);
     respPacket.setData(builder.build().toByteArray());
+    resetSignature(respPacket);
   }
 
   protected void disconnectExt(Collection<Session> sessions) {
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public boolean isLoggedIn(Channel channel, CDTPPacket packet) {
     String temail = packet.getHeader().getSender();
     String deviceId = packet.getHeader().getDeviceId();
-    if (!authSession(channel, temail, deviceId) ||
-        !isLoggedInExt(packet)) {
+    boolean loggedIn = hasSession(channel, temail, deviceId) && isLoggedInExt(packet);
+    if (!loggedIn) {
       CDTPPacket errorPacket = errorPacket(packet, INTERNAL_ERROR.getCode(),
           "用户" + temail + "在设备" + deviceId + "上没有登录，无法进行操作！");
       channel.writeAndFlush(errorPacket);
-      return false;
     }
-    return true;
+    return loggedIn;
   }
 
   @Override
-  public void login(Channel channel, CDTPPacket reqPacket) {
-    CDTPHeader header = reqPacket.getHeader();
-    CDTPPacket respPacket = new CDTPPacket(reqPacket);
-    if (loginExt(reqPacket, respPacket)) {
+  public void login(Channel channel, CDTPPacket packet) {
+    CDTPHeader header = packet.getHeader();
+    CDTPPacket respPacket = new CDTPPacket(packet);
+    if (loginExt(packet, respPacket)) {
       channelHolder.addSession(header.getSender(), header.getDeviceId(), channel);
       channel.writeAndFlush(respPacket);
     } else {
       channel.writeAndFlush(respPacket);
-      if (channelHolder.hasNoSession(channel)) {
-        log.debug("连接关闭前的请求堆栈信息", new RuntimeException(channel.toString()));
-        channel.close();
-      }
     }
   }
+//
+//  @Override
+//  public boolean bind(Channel channel, CDTPPacket packet) {
+//    String temail = packet.getHeader().getSender();
+//    String deviceId = packet.getHeader().getDeviceId();
+//    if (hasSession(channel, temail, deviceId)) {
+//      // 已经构建会话
+//      return true;
+//    }
+//    CDTPPacket respPacket = new CDTPPacket(packet);
+//    boolean loginExt = loginExt(packet, respPacket);
+//    if (loginExt) {
+//      // 成功登录
+//      channelHolder.addSession(temail, deviceId, channel);
+//    } else {
+//      channel.writeAndFlush(respPacket);
+//    }
+//    return loginExt;
+//  }
 
   @Override
-  public void logout(Channel channel, CDTPPacket reqPacket) {
-    CDTPHeader header = reqPacket.getHeader();
-    CDTPPacket respPacket = new CDTPPacket(reqPacket);
-    logoutExt(reqPacket, respPacket);
+  public void logout(Channel channel, CDTPPacket packet) {
+    CDTPHeader header = packet.getHeader();
+    CDTPPacket respPacket = new CDTPPacket(packet);
+    logoutExt(packet, respPacket);
     channel.writeAndFlush(respPacket);
     channelHolder.removeSession(header.getSender(), header.getDeviceId(), channel);
   }
@@ -89,6 +117,7 @@ public abstract class AbstractSessionService implements SessionService {
   public void disconnect(Channel channel) {
     Collection<Session> sessions = channelHolder.removeChannel(channel);
     disconnectExt(sessions);
+    channel.close();
   }
 
   private CDTPPacket errorPacket(CDTPPacket packet, int code, String message) {
@@ -102,9 +131,8 @@ public abstract class AbstractSessionService implements SessionService {
     return packet;
   }
 
-  private boolean authSession(Channel channel, String temail, String deviceId) {
-    return isNotEmpty(temail)
-        && isNotEmpty(deviceId)
+  private boolean hasSession(Channel channel, String temail, String deviceId) {
+    return isNotEmpty(temail) && isNotEmpty(deviceId)
         && channel == channelHolder.getChannel(temail, deviceId);
   }
 
