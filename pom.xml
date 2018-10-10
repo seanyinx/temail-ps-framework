@@ -17,6 +17,7 @@
     <module>ps-common</module>
     <module>ps-client</module>
     <module>ps-server</module>
+    <module>ps-all</module>
     <module>temail-gateway</module>
   </modules>
   <packaging>pom</packaging>
