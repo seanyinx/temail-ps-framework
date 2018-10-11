@@ -55,9 +55,8 @@ public class PsServerHandler extends SimpleChannelInboundHandler<CDTPPacket> {
               Integer.toHexString(command));
         }
       } else {
-//        if (sessionService.bind(channel, packet)) {
+        sessionService.bind(channel, packet);
         requestService.handleRequest(packet, channel::writeAndFlush);
-//        }
       }
     } catch (Exception e) {
       throw new PacketException(e, packet);
