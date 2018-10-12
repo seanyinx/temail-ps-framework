@@ -1,6 +1,7 @@
 package com.syswin.temail.ps.server.handler;
 
 import com.syswin.temail.ps.server.service.SessionService;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleUserEventChannelHandler;
@@ -25,13 +26,16 @@ public class IdleHandler extends SimpleUserEventChannelHandler<IdleStateEvent> {
   @Override
   protected void eventReceived(ChannelHandlerContext ctx, IdleStateEvent evt) {
     if (evt.state() == IdleState.READER_IDLE) {
-      sessionService.disconnect(ctx.channel());
+      Channel channel = ctx.channel();
+      sessionService.disconnect(channel);
+      channel.close();
     }
   }
 
   @Override
   public void channelInactive(ChannelHandlerContext ctx) {
     sessionService.disconnect(ctx.channel());
+    ctx.channel().close();
   }
 
 }

@@ -81,7 +81,6 @@ public abstract class AbstractSessionService implements SessionService {
   public final void disconnect(Channel channel) {
     Collection<Session> sessions = channelHolder.removeChannel(channel);
     disconnectExt(sessions);
-    channel.close();
   }
 
   private boolean hasSession(Channel channel, String temail, String deviceId) {

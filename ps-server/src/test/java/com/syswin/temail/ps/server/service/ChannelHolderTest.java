@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -86,6 +87,8 @@ public class ChannelHolderTest {
     assertThat(sessions).hasSize(1);
   }
 
+  // 会话管理与通道管理分享，通道不会被会话自动关闭
+  @Ignore
   @Test
   public void shouldReplaceSession() {
     channelHolder.addSession(temail, deviceId1, channel);
@@ -123,6 +126,8 @@ public class ChannelHolderTest {
     verify(this.newChannel, never()).close();
   }
 
+  // 会话管理与通道管理分享，通道不会被会话自动关闭
+  @Ignore
   @Test
   public void shouldRemoveSession() {
     channelHolder.addSession(temail, deviceId1, channel);
@@ -147,6 +152,8 @@ public class ChannelHolderTest {
     verify(this.channel).close();
   }
 
+  // 会话管理与通道管理分享，通道不会被会话自动关闭
+  @Ignore
   @Test
   public void shouldRemoveChannel() {
     channelHolder.addSession(temail, deviceId1, channel);
@@ -168,6 +175,8 @@ public class ChannelHolderTest {
     verify(this.channel).close();
   }
 
+  // 会话管理与通道管理分享，通道不会被会话自动关闭
+  @Ignore
   @Test
   public void shouldRetainSessionIfItHasOtherChannel() {
     channelHolder.addSession(temail, deviceId1, channel);
