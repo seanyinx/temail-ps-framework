@@ -63,10 +63,9 @@ public class PsServer {
 
   private final IdleHandler idleHandler;
   private final PsServerHandler psServerHandler;
-  private final PacketDecoder packetDecoder;
-  private final PacketEncoder packetEncoder;
   private final int port;
   private final int idleTimeSeconds;
+  private final BodyExtractor bodyExtractor;
 
   public PsServer(SessionService sessionService, RequestService requestService, int port, int idleTimeSeconds) {
     this(sessionService, requestService, port, idleTimeSeconds, new SimpleBodyExtractor());
@@ -77,8 +76,7 @@ public class PsServer {
     this.idleHandler = new IdleHandler(sessionService);
     this.port = port;
     this.idleTimeSeconds = idleTimeSeconds;
-    this.packetEncoder = new PacketEncoder();
-    this.packetDecoder = new PacketDecoder(bodyExtractor);
+    this.bodyExtractor = bodyExtractor;
     this.psServerHandler = new PsServerHandler(sessionService, requestService, new HeartBeatService());
   }
 
@@ -107,8 +105,8 @@ public class PsServer {
                     new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, Constants.LENGTH_FIELD_LENGTH, 0, 0))
                 .addLast("lengthFieldPrepender",
                     new LengthFieldPrepender(Constants.LENGTH_FIELD_LENGTH, 0, false))
-                .addLast("packetDecoder", packetDecoder)
-                .addLast("packetEncoder", packetEncoder)
+                .addLast("packetDecoder", new PacketDecoder(bodyExtractor))
+                .addLast("packetEncoder", new PacketEncoder())
                 .addLast("psServerHandler", psServerHandler);
           }
         });
