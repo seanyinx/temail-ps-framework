@@ -27,13 +27,19 @@
     <rocketmq-client.version>4.3.0</rocketmq-client.version>
     <pact.version>3.5.20</pact.version>
     <zookeeper.version>3.3.6</zookeeper.version>
-    <temail-channel-registry-client.version>1.0.0-SNAPSHOT</temail-channel-registry-client.version>
     <spring.boot.version>2.0.4.RELEASE</spring.boot.version>
     <ps.version>1.0.0-SNAPSHOT</ps.version>
     <awaitility.version>3.0.0</awaitility.version>
     <unit-scaffolding.version>1.0.0</unit-scaffolding.version>
     <netty.version>4.1.27.Final</netty.version>
   </properties>
+
+  <scm>
+    <url>http://git.systoon.com/ZJC_Java/temail-gateway</url>
+    <connection>scm:git:git@172.28.4.12:ZJC_Java/temail-gateway.git</connection>
+    <developerConnection>scm:git:git@172.28.4.12:ZJC_Java/temail-gateway.git</developerConnection>
+    <tag>${project.version}</tag>
+  </scm>
 
   <dependencyManagement>
     <dependencies>
@@ -243,6 +249,17 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.scm</groupId>
+            <artifactId>maven-scm-provider-gitexe</artifactId>
+            <version>1.8.1</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>
