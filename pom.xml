@@ -17,6 +17,7 @@
     <module>ps-client</module>
     <module>ps-server</module>
     <module>ps-all</module>
+    <module>ps-packet</module>
     <module>temail-gateway</module>
   </modules>
   <packaging>pom</packaging>
@@ -55,6 +56,11 @@
       <dependency>
         <groupId>com.syswin.temail</groupId>
         <artifactId>ps-client</artifactId>
+        <version>${ps.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.syswin.temail</groupId>
+        <artifactId>ps-packet</artifactId>
         <version>${ps.version}</version>
       </dependency>
 

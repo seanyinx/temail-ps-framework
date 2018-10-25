@@ -1,6 +1,6 @@
 package com.syswin.temail.ps.server.service;
 
-import static com.syswin.temail.ps.common.utils.SignatureUtil.resetSignature;
+import static com.syswin.temail.ps.server.utils.SignatureUtil.resetSignature;
 
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;

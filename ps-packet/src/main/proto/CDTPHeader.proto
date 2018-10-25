@@ -1,0 +1,50 @@
+syntax = "proto3";
+package com.syswin.temail.gateway;
+
+option java_package = "com.syswin.temail.ps.common.entity";
+option java_outer_classname = "CDTPProtoBuf";
+
+
+message CDTPHeader {
+  string deviceId = 1;
+  int32 signatureAlgorithm = 2;
+  string signature = 3;
+  int32 dataEncryptionMethod = 4;
+  fixed64 timestamp = 5;
+  string packetId = 6;
+  string sender = 7;
+  string senderPK = 8;
+  string receiver = 9;
+  string receiverPK = 10;
+  string at = 11;
+  string topic = 12;
+  string extraData = 13;
+  string targetAddress = 14;
+}
+
+
+message CDTPLogin{
+string pushToken = 1;
+string platform = 2;
+string osVer = 3;
+string appVer = 4;
+string lang = 5;
+string temail = 6;
+string chl = 7;
+}
+
+message CDTPLoginResp{
+int32 code = 1;
+string desc = 2;
+}
+
+
+message CDTPLogoutResp{
+int32 code = 1;
+string desc = 2;
+}
+
+message CDTPServerError{
+int32 code = 1;
+string desc = 2;
+}
