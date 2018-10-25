@@ -47,7 +47,7 @@ public class ByteBuf {
   }
 
   public int readableBytes() {
-    return buf.length - readerIndex;
+    return writerIndex - readerIndex;
   }
 
   public int readInt() {
@@ -62,19 +62,29 @@ public class ByteBuf {
   }
 
   public void readBytes(byte[] headerBytes) {
-    if (headerBytes == null) {
+    if (headerBytes == null || headerBytes.length == 0) {
       return;
     }
     System.arraycopy(buf, readerIndex, headerBytes, 0, headerBytes.length);
+    readerIndex += headerBytes.length;
+  }
+
+  public void writeInt(int data) {
+    extendBuf(4);
+    buf[writerIndex++] = (byte) (data >>> 24 & 0xff);
+    buf[writerIndex++] = (byte) (data >>> 16 & 0xff);
+    buf[writerIndex++] = (byte) (data >>> 8 & 0xff);
+    buf[writerIndex++] = (byte) (data & 0xff);
   }
 
   public void writeShort(int data) {
-    extendBuf(4);
-    buf[writerIndex++] = (byte) (data >> 8 & 0xff);
+    extendBuf(2);
+    buf[writerIndex++] = (byte) (data >>> 8 & 0xff);
     buf[writerIndex++] = (byte) (data & 0xff);
   }
 
   public void writeBytes(byte[] bytes) {
+    extendBuf(bytes.length);
     System.arraycopy(bytes, 0, buf, writerIndex, bytes.length);
     writerIndex += bytes.length;
   }
@@ -86,9 +96,10 @@ public class ByteBuf {
   }
 
   private void extendBuf(int length) {
-    if(buf.length < writerIndex + length){
+    if (buf.length < writerIndex + length) {
       byte[] bytes = new byte[buf.length * 2];
-
+      System.arraycopy(buf, 0, bytes, 0, writerIndex);
+      this.buf = bytes;
     }
   }
 }
