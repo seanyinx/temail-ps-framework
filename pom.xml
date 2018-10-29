@@ -33,9 +33,9 @@
   </properties>
 
   <scm>
-    <url>http://git.systoon.com/ZJC_Java/temail-gateway</url>
-    <connection>scm:git:git@172.28.4.12:ZJC_Java/temail-gateway.git</connection>
-    <developerConnection>scm:git:git@172.28.4.12:ZJC_Java/temail-gateway.git</developerConnection>
+    <url>http://172.28.4.12/java_temail/temail-ps-server</url>
+    <connection>scm:git:git@172.28.4.12:java_temail/temail-ps-server.git</connection>
+    <developerConnection>scm:git:git@172.28.4.12:java_temail/temail-ps-server.git</developerConnection>
     <tag>${project.version}</tag>
   </scm>
 
