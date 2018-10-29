@@ -1,5 +1,7 @@
 package com.syswin.temail.ps.common.utils;
 
+import com.syswin.temail.ps.common.exception.PacketException;
+
 /**
  * 对应于Netty的ByteBuf，为减少对Netty的依赖而编写
  *
@@ -51,6 +53,7 @@ public class ByteBuf {
   }
 
   public int readInt() {
+    checkReadLen(4);
     return (buf[readerIndex++] & 0xff) << 24 |
         (buf[readerIndex++] & 0xff) << 16 |
         (buf[readerIndex++] & 0xff) << 8 |
@@ -58,15 +61,23 @@ public class ByteBuf {
   }
 
   public short readShort() {
+    checkReadLen(2);
     return (short) ((buf[readerIndex++] & 0xff) << 8 | (buf[readerIndex++] & 0xff));
   }
 
-  public void readBytes(byte[] headerBytes) {
-    if (headerBytes == null || headerBytes.length == 0) {
+  public void readBytes(byte[] bytes) {
+    if (bytes == null || bytes.length == 0) {
       return;
     }
-    System.arraycopy(buf, readerIndex, headerBytes, 0, headerBytes.length);
-    readerIndex += headerBytes.length;
+    checkReadLen(bytes.length);
+    System.arraycopy(buf, readerIndex, bytes, 0, bytes.length);
+    readerIndex += bytes.length;
+  }
+
+  private void checkReadLen(int intendReadLen) {
+    if (this.readerIndex + intendReadLen > this.buf.length) {
+      throw new PacketException("试图读取的长度" + intendReadLen + "已经超过可读取的长度" + this.readableBytes());
+    }
   }
 
   public void writeInt(int data) {
@@ -97,7 +108,7 @@ public class ByteBuf {
 
   private void extendBuf(int length) {
     if (buf.length < writerIndex + length) {
-      byte[] bytes = new byte[buf.length * 2];
+      byte[] bytes = new byte[(writerIndex + length) * 2];
       System.arraycopy(buf, 0, bytes, 0, writerIndex);
       this.buf = bytes;
     }
