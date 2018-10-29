@@ -10,7 +10,7 @@
 
   <groupId>com.syswin.temail</groupId>
   <artifactId>temail-gateway-parent</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2-SNAPSHOT</version>
   <modules>
     <module>ps-common</module>
     <module>ps-client</module>
@@ -27,7 +27,7 @@
     <pact.version>3.5.20</pact.version>
     <zookeeper.version>3.3.6</zookeeper.version>
     <spring.boot.version>2.0.4.RELEASE</spring.boot.version>
-    <ps.version>1.0.1</ps.version>
+    <ps.version>1.0.2-SNAPSHOT</ps.version>
     <awaitility.version>3.0.0</awaitility.version>
     <unit-scaffolding.version>1.0.0</unit-scaffolding.version>
     <netty.version>4.1.27.Final</netty.version>
@@ -37,7 +37,7 @@
     <url>http://git.systoon.com/ZJC_Java/temail-gateway</url>
     <connection>scm:git:git@172.28.4.12:ZJC_Java/temail-gateway.git</connection>
     <developerConnection>scm:git:git@172.28.4.12:ZJC_Java/temail-gateway.git</developerConnection>
-    <tag>v1.0.1</tag>
+    <tag>${project.version}</tag>
   </scm>
 
   <dependencyManagement>
