@@ -28,12 +28,12 @@ public class PacketUtil {
    * @param packetData Base64UrlSafe形式的CDTPPacket包，包含前导的长度
    * @return 解包后的CDTPPacket对象
    */
-  public static CDTPPacket unpacket(String packetData) {
-    return unpacket(Base64.getUrlDecoder().decode(packetData), SIMPLE_BODY_EXTRACTOR);
+  public static CDTPPacket unpack(String packetData) {
+    return unpack(Base64.getUrlDecoder().decode(packetData), SIMPLE_BODY_EXTRACTOR);
   }
 
-  public static CDTPPacket unpacket(String packetData, BodyExtractor bodyExtractor) {
-    return unpacket(Base64.getUrlDecoder().decode(packetData), bodyExtractor);
+  public static CDTPPacket unpack(String packetData, BodyExtractor bodyExtractor) {
+    return unpack(Base64.getUrlDecoder().decode(packetData), bodyExtractor);
   }
 
   /**
@@ -42,11 +42,11 @@ public class PacketUtil {
    * @param packetData 字节数组形式的CDTPPacket包，包含前导的长度
    * @return 解包后的CDTPPacket对象
    */
-  public static CDTPPacket unpacket(byte[] packetData) {
-    return unpacket(packetData, SIMPLE_BODY_EXTRACTOR);
+  public static CDTPPacket unpack(byte[] packetData) {
+    return unpack(packetData, SIMPLE_BODY_EXTRACTOR);
   }
 
-  public static CDTPPacket unpacket(byte[] packetData, BodyExtractor bodyExtractor) {
+  public static CDTPPacket unpack(byte[] packetData, BodyExtractor bodyExtractor) {
     if (packetData == null || packetData.length <= LENGTH_FIELD_LENGTH) {
       return null;
     }
@@ -108,7 +108,7 @@ public class PacketUtil {
   }
 
 
-  public static byte[] packet(CDTPPacket packet) {
+  public static byte[] pack(CDTPPacket packet) {
     ByteBuf byteBuf = new ByteBuf(DEFAULT_ALLOC_LENGTH);
     byteBuf.writeShort(packet.getCommandSpace());
     byteBuf.writeShort(packet.getCommand());

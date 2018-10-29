@@ -19,11 +19,11 @@ public class PacketUtilTest {
   @Test
   public void testPacketAndUnpacket() {
     CDTPPacket packet = PacketMaker.sendSingleCharPacket(sender, receive, content);
-    byte[] bytes = PacketUtil.packet(packet);
+    byte[] bytes = PacketUtil.pack(packet);
     ByteBuf byteBuf = new ByteBuf(bytes.length + 4);
     byteBuf.writeInt(bytes.length);
     byteBuf.writeBytes(bytes);
-    CDTPPacket unpacket = PacketUtil.unpacket(byteBuf.getArray());
-    Assert.assertEquals(packet, unpacket);
+    CDTPPacket unpackedPacket = PacketUtil.unpack(byteBuf.getArray());
+    Assert.assertEquals(packet, unpackedPacket);
   }
 }
