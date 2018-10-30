@@ -1,8 +1,6 @@
 package com.syswin.temail.ps.common.utils;
 
 import static com.syswin.temail.ps.common.Constants.LENGTH_FIELD_LENGTH;
-import static com.syswin.temail.ps.common.entity.CommandSpaceType.GROUP_MESSAGE_CODE;
-import static com.syswin.temail.ps.common.entity.CommandSpaceType.SINGLE_MESSAGE_CODE;
 import static com.syswin.temail.ps.common.utils.ByteBuf.DEFAULT_ALLOC_LENGTH;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -10,10 +8,8 @@ import com.syswin.temail.ps.common.codec.BodyExtractor;
 import com.syswin.temail.ps.common.codec.SimpleBodyExtractor;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
-import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
 import com.syswin.temail.ps.common.entity.CDTPProtoBuf;
 import com.syswin.temail.ps.common.exception.PacketException;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,48 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 public class PacketUtil {
 
   private static final SimpleBodyExtractor SIMPLE_BODY_EXTRACTOR = new SimpleBodyExtractor();
-
-  public static byte[] decodeData(CDTPPacketTrans packet, boolean original) {
-    String data = packet.getData();
-    if (data == null) {
-      return new byte[0];
-    }
-    short commandSpace = packet.getCommandSpace();
-    short command = packet.getCommand();
-    if (isSendSingleMsg(commandSpace, command)) {
-      byte[] packetBytes = Base64.getUrlDecoder().decode(data);
-      if (original) {
-        CDTPPacket originalPacket = unpack(packetBytes);
-        return originalPacket.getData();
-      } else {
-        return packetBytes;
-      }
-    } else {
-      return data.getBytes(StandardCharsets.UTF_8);
-    }
-  }
-
-  public static String encodeData(CDTPPacket packet) {
-    short commandSpace = packet.getCommandSpace();
-    short command = packet.getCommand();
-    if (isSendSingleMsg(commandSpace, command)) {
-      return Base64.getUrlEncoder().encodeToString(packet.getData());
-    } else {
-      return new String(packet.getData(), StandardCharsets.UTF_8);
-    }
-  }
-
-  public static boolean isSendSingleMsg(short commandSpace, short command) {
-    return commandSpace == SINGLE_MESSAGE_CODE && command == 1;
-  }
-
-  public static boolean isSendGroupMsg(short commandSpace, short command) {
-    return commandSpace == GROUP_MESSAGE_CODE && command == 1;
-  }
-
-  public static boolean isGroupJoin(short commandSpace, short command) {
-    return commandSpace == 2 && command == 0x0107;
-  }
 
   /**
    * 将收到的字节数组的CDTPPacket进行解包，生成Message对象。主要用于单聊、群聊等服务端保留完整Packet的情况

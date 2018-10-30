@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public final class CDTPHeader {
+public final class CDTPHeader implements Cloneable {
 
   private String deviceId;
   private int signatureAlgorithm;
