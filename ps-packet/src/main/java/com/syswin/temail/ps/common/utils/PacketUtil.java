@@ -33,8 +33,7 @@ public class PacketUtil {
     }
     short commandSpace = packet.getCommandSpace();
     short command = packet.getCommand();
-    if (isSendSingleMsg(commandSpace, command) ||
-        isSendGroupMsg(commandSpace, command)) {
+    if (isSendSingleMsg(commandSpace, command)) {
       byte[] packetBytes = Base64.getUrlDecoder().decode(data);
       if (original) {
         CDTPPacket originalPacket = unpack(packetBytes);
@@ -50,8 +49,7 @@ public class PacketUtil {
   public static String encodeData(CDTPPacket packet) {
     short commandSpace = packet.getCommandSpace();
     short command = packet.getCommand();
-    if (isSendSingleMsg(commandSpace, command) ||
-        isSendGroupMsg(commandSpace, command)) {
+    if (isSendSingleMsg(commandSpace, command)) {
       return Base64.getUrlEncoder().encodeToString(packet.getData());
     } else {
       return new String(packet.getData(), StandardCharsets.UTF_8);
