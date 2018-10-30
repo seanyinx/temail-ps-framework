@@ -109,6 +109,10 @@ public class PacketUtil {
 
 
   public static byte[] pack(CDTPPacket packet) {
+    return pack(packet, false);
+  }
+
+  public static byte[] pack(CDTPPacket packet, boolean includeLength) {
     ByteBuf byteBuf = new ByteBuf(DEFAULT_ALLOC_LENGTH);
     byteBuf.writeShort(packet.getCommandSpace());
     byteBuf.writeShort(packet.getCommand());
@@ -122,6 +126,17 @@ public class PacketUtil {
       byteBuf.writeShort(0);
     }
     byteBuf.writeBytes(packet.getData());
-    return byteBuf.getArray();
+    byte[] packetBytes = byteBuf.getArray();
+
+    if (includeLength) {
+      ByteBuf lengthBuf = new ByteBuf(4);
+      lengthBuf.writeInt(packetBytes.length);
+      byte[] result = new byte[packetBytes.length + 4];
+      System.arraycopy(lengthBuf.getArray(), 0, result, 0, 4);
+      System.arraycopy(packetBytes, 0, result, 4, packetBytes.length);
+      return result;
+    } else {
+      return packetBytes;
+    }
   }
 }
