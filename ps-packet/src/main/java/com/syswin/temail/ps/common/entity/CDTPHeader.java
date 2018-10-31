@@ -60,7 +60,7 @@ public final class CDTPHeader implements Cloneable {
     }
   }
 
-  public CDTPProtoBuf.CDTPHeader toCDTPHeader() {
+  public CDTPProtoBuf.CDTPHeader toProtobufHeader() {
     Builder builder = CDTPProtoBuf.CDTPHeader.newBuilder();
     if (deviceId != null) {
       builder.setDeviceId(getDeviceId());

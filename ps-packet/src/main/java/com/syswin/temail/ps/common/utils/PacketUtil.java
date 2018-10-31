@@ -1,7 +1,6 @@
 package com.syswin.temail.ps.common.utils;
 
 import static com.syswin.temail.ps.common.Constants.LENGTH_FIELD_LENGTH;
-import static com.syswin.temail.ps.common.utils.ByteBuf.DEFAULT_ALLOC_LENGTH;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.syswin.temail.ps.common.codec.BodyExtractor;
@@ -113,30 +112,24 @@ public class PacketUtil {
   }
 
   public static byte[] pack(CDTPPacket packet, boolean includeLength) {
-    ByteBuf byteBuf = new ByteBuf(DEFAULT_ALLOC_LENGTH);
+    CDTPHeader header = packet.getHeader();
+    byte[] headerBytes;
+    if (header != null) {
+      headerBytes = header.toProtobufHeader().toByteArray();
+    } else {
+      headerBytes = new byte[0];
+    }
+    int byteBufLen = (includeLength ? LENGTH_FIELD_LENGTH : 0) + 8 + headerBytes.length + packet.getData().length;
+    ByteBuf byteBuf = new ByteBuf(byteBufLen);
+    if (includeLength) {
+      byteBuf.writeInt(byteBufLen - LENGTH_FIELD_LENGTH);
+    }
     byteBuf.writeShort(packet.getCommandSpace());
     byteBuf.writeShort(packet.getCommand());
     byteBuf.writeShort(packet.getVersion());
-    CDTPHeader header = packet.getHeader();
-    if (header != null) {
-      byte[] headerBytes = header.toCDTPHeader().toByteArray();
-      byteBuf.writeShort(headerBytes.length);
-      byteBuf.writeBytes(headerBytes);
-    } else {
-      byteBuf.writeShort(0);
-    }
+    byteBuf.writeShort(headerBytes.length);
+    byteBuf.writeBytes(headerBytes);
     byteBuf.writeBytes(packet.getData());
-    byte[] packetBytes = byteBuf.getArray();
-
-    if (includeLength) {
-      ByteBuf lengthBuf = new ByteBuf(4);
-      lengthBuf.writeInt(packetBytes.length);
-      byte[] result = new byte[packetBytes.length + 4];
-      System.arraycopy(lengthBuf.getArray(), 0, result, 0, 4);
-      System.arraycopy(packetBytes, 0, result, 4, packetBytes.length);
-      return result;
-    } else {
-      return packetBytes;
-    }
+    return byteBuf.getBuf();
   }
 }

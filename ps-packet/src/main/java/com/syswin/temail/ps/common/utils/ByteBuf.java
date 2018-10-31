@@ -106,6 +106,10 @@ public class ByteBuf {
     return bytes;
   }
 
+  public byte[] getBuf(){
+    return this.buf;
+  }
+
   private void extendBuf(int length) {
     if (buf.length < writerIndex + length) {
       byte[] bytes = new byte[(writerIndex + length) * 2];
