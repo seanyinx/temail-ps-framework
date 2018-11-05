@@ -10,6 +10,7 @@ import com.syswin.temail.ps.server.Constants;
 import com.syswin.temail.ps.server.entity.Session;
 import io.netty.channel.Channel;
 import java.util.Collection;
+import java.util.function.Consumer;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,12 +24,14 @@ public abstract class AbstractSessionService implements SessionService {
   @Getter
   private final ChannelHolder channelHolder = new ChannelHolder();
 
-  protected boolean loginExt(CDTPPacket packet, CDTPPacket respPacket) {
+  protected void loginExtAsync(CDTPPacket reqPacket, Consumer<CDTPPacket> successHandler,
+      Consumer<CDTPPacket> failedHandler) {
+    CDTPPacket respPacket = new CDTPPacket(reqPacket);
     CDTPLoginResp.Builder builder = CDTPLoginResp.newBuilder();
     builder.setCode(Constants.HTTP_STATUS_OK);
     respPacket.setData(builder.build().toByteArray());
     resetSignature(respPacket);
-    return true;
+    successHandler.accept(respPacket);
   }
 
   protected void logoutExt(CDTPPacket packet, CDTPPacket respPacket) {
@@ -42,30 +45,30 @@ public abstract class AbstractSessionService implements SessionService {
   }
 
   @Override
-  public final void login(Channel channel, CDTPPacket packet) {
-    CDTPHeader header = packet.getHeader();
-    CDTPPacket respPacket = new CDTPPacket(packet);
-    if (loginExt(packet, respPacket)) {
-      channelHolder.addSession(header.getSender(), header.getDeviceId(), channel);
-      channel.writeAndFlush(respPacket);
-    } else {
-      channel.writeAndFlush(respPacket);
-    }
+  public final void login(Channel channel, CDTPPacket reqPacket) {
+    CDTPHeader header = reqPacket.getHeader();
+    loginExtAsync(reqPacket,
+        respPacket -> {
+          channelHolder.addSession(header.getSender(), header.getDeviceId(), channel);
+          channel.writeAndFlush(respPacket);
+        },
+        channel::writeAndFlush);
   }
 
   @Override
-  public final void bind(Channel channel, CDTPPacket packet) {
-    String temail = packet.getHeader().getSender();
-    String deviceId = packet.getHeader().getDeviceId();
+  public final void bind(Channel channel, CDTPPacket reqPacket) {
+    String temail = reqPacket.getHeader().getSender();
+    String deviceId = reqPacket.getHeader().getDeviceId();
     if (hasSession(channel, temail, deviceId)) {
       // 已经构建会话
       return;
     }
-    CDTPPacket respPacket = new CDTPPacket(packet);
-    if (loginExt(packet, respPacket)) {
-      // 成功登录
-      channelHolder.addSession(temail, deviceId, channel);
-    }
+    loginExtAsync(reqPacket,
+        respPacket ->
+            channelHolder.addSession(temail, deviceId, channel),
+        respPacket -> {
+          // 自动绑定操作，登录失败不需要处理
+        });
   }
 
   @Override
