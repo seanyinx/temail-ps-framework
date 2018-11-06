@@ -1,6 +1,7 @@
 package com.syswin.temail.ps.common.utils;
 
 import static com.syswin.temail.ps.common.Constants.LENGTH_FIELD_LENGTH;
+import static com.syswin.temail.ps.common.utils.StringUtil.defaultString;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.syswin.temail.ps.common.codec.BodyExtractor;
@@ -101,8 +102,6 @@ public class PacketUtil {
     byte[] data = bodyExtractor.fromBuffer(commandSpace, command, byteBuf, packetLength - headerLength - 8);
 
     packet.setData(data);
-
-    bodyExtractor.decrypt(packet);
     return packet;
   }
 
@@ -132,4 +131,17 @@ public class PacketUtil {
     byteBuf.writeBytes(packet.getData());
     return byteBuf.getBuf();
   }
+
+
+  public static String getUnsignData(CDTPPacket packet) {
+    CDTPHeader header = packet.getHeader();
+    byte[] data = packet.getData();
+    String targetAddress = defaultString(header.getTargetAddress());
+    String dataSha256 = data == null ? "" : HexUtil.encodeHex(DigestUtil.sha256(data));
+    return String.valueOf(packet.getCommandSpace() + packet.getCommand())
+        + targetAddress
+        + String.valueOf(header.getTimestamp())
+        + dataSha256;
+  }
+
 }

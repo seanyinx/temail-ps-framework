@@ -106,7 +106,7 @@ public class ByteBuf {
     return bytes;
   }
 
-  public byte[] getBuf(){
+  public byte[] getBuf() {
     return this.buf;
   }
 

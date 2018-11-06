@@ -1,11 +1,13 @@
 package com.syswin.temail.ps.common.entity;
 
 import com.syswin.temail.ps.common.exception.PacketException;
+import lombok.Getter;
 
 /**
  * @author 姚华成
  * @date 2018-9-20
  */
+@Getter
 public enum DataEncryptType {
   NONE(0),
   RSA_RECEIVER_PUB(1),
