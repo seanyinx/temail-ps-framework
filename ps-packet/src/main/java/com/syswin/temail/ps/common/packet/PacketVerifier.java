@@ -8,5 +8,7 @@ import com.syswin.temail.ps.common.entity.CDTPPacket;
  */
 public interface PacketVerifier {
 
+  PacketVerifier NoOp = packet -> true;
+
   boolean verify(CDTPPacket packet);
 }

@@ -13,7 +13,6 @@ import com.syswin.temail.ps.common.packet.PacketEncryptor;
 import com.syswin.temail.ps.common.packet.PacketSigner;
 import com.syswin.temail.ps.common.packet.PacketVerifier;
 import com.syswin.temail.ps.common.utils.StringUtil;
-import com.syswin.temail.ps.server.exception.PsServerException;
 import com.syswin.temail.ps.server.service.RequestService;
 import com.syswin.temail.ps.server.service.SessionService;
 import lombok.NonNull;
@@ -37,6 +36,7 @@ public class PsServerBuilder {
   private PacketEncryptor encryptor;
   private PacketDecryptor decryptor;
 
+  private KeyAwareVault vault;
   private String vaultRegistryUrl;
   private String tenantId;
 
@@ -60,40 +60,25 @@ public class PsServerBuilder {
    */
   public PsServer build() {
 
-    KeyAwareVault vault = null;
-    if (StringUtil.hasText(vaultRegistryUrl) && StringUtil.hasText(tenantId)) {
+    if (bodyExtractor == null) {
+      bodyExtractor = new SimpleBodyExtractor();
+    }
+    if (vault == null &&
+        StringUtil.hasText(vaultRegistryUrl) &&
+        StringUtil.hasText(tenantId)) {
       vault = VaultKeeper.keyAwareVault(vaultRegistryUrl, tenantId);
     }
     if (signer == null) {
-      if (vault != null) {
-        signer = new KeyAwareEccPacketSigner(vault);
-      } else {
-        throw new PsServerException("自动签名必须设置签名对象signer，或者指定vaultRegistryUrl和tenantId！");
-      }
+      signer = (vault == null) ? PacketSigner.NoOp : new KeyAwareEccPacketSigner(vault);
     }
-
     if (verifier == null) {
-      if (vault != null) {
-        verifier = new KeyAwarePacketVerifier(vault);
-      } else {
-        throw new PsServerException("自动验签必须设置签名验证对象verifier，或者指定vaultRegistryUrl和tenantId！");
-      }
+      verifier = (vault == null) ? PacketVerifier.NoOp : new KeyAwarePacketVerifier(vault);
     }
-
     if (encryptor == null) {
-      if (vault != null) {
-        encryptor = new KeyAwareEccPacketEncryptor(vault);
-      } else {
-        throw new PsServerException("自动加密必须设置加密对象encryptor，或者指定vaultRegistryUrl和tenantId！");
-      }
+      encryptor = (vault == null) ? PacketEncryptor.NoOp : new KeyAwareEccPacketEncryptor(vault);
     }
-
     if (decryptor == null) {
-      if (vault != null) {
-        decryptor = new KeyAwarePacketDecryptor(vault);
-      } else {
-        throw new PsServerException("自动解密必须设置解密对象decryptor，或者指定vaultRegistryUrl和tenantId！");
-      }
+      decryptor = (vault == null) ? PacketDecryptor.NoOp : new KeyAwarePacketDecryptor(vault);
     }
 
     return new PsServer(sessionService, requestService, port, idleTimeSeconds,
@@ -135,6 +120,11 @@ public class PsServerBuilder {
     return this;
   }
 
+  public PsServerBuilder vault(KeyAwareVault vault) {
+    this.vault = vault;
+    return this;
+  }
+
   public PsServerBuilder signer(PacketSigner signer) {
     this.signer = signer;
     return this;
@@ -154,4 +144,5 @@ public class PsServerBuilder {
     this.decryptor = decryptor;
     return this;
   }
+
 }

@@ -23,28 +23,28 @@ message CDTPHeader {
 }
 
 
-message CDTPLogin{
-string pushToken = 1;
-string platform = 2;
-string osVer = 3;
-string appVer = 4;
-string lang = 5;
-string temail = 6;
-string chl = 7;
+message CDTPLogin {
+  string pushToken = 1;
+  string platform = 2;
+  string osVer = 3;
+  string appVer = 4;
+  string lang = 5;
+  string temail = 6;
+  string chl = 7;
 }
 
-message CDTPLoginResp{
-int32 code = 1;
-string desc = 2;
+message CDTPLoginResp {
+  int32 code = 1;
+  string desc = 2;
 }
 
 
-message CDTPLogoutResp{
-int32 code = 1;
-string desc = 2;
+message CDTPLogoutResp {
+  int32 code = 1;
+  string desc = 2;
 }
 
-message CDTPServerError{
-int32 code = 1;
-string desc = 2;
+message CDTPServerError {
+  int32 code = 1;
+  string desc = 2;
 }

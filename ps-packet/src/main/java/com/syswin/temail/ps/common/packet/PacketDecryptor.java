@@ -8,5 +8,8 @@ import com.syswin.temail.ps.common.entity.CDTPPacket;
  */
 public interface PacketDecryptor {
 
+  PacketDecryptor NoOp = packet -> {
+  };
+
   void decrypt(CDTPPacket packet);
 }

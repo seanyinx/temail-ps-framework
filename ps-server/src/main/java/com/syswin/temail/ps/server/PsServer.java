@@ -5,10 +5,6 @@ import com.syswin.temail.ps.common.codec.BodyExtractor;
 import com.syswin.temail.ps.common.codec.PacketDecoder;
 import com.syswin.temail.ps.common.codec.PacketEncoder;
 import com.syswin.temail.ps.common.codec.SimpleBodyExtractor;
-import com.syswin.temail.ps.common.packet.NoOpPacketDecryptor;
-import com.syswin.temail.ps.common.packet.NoOpPacketEncryptor;
-import com.syswin.temail.ps.common.packet.NoOpPacketSigner;
-import com.syswin.temail.ps.common.packet.NoOpPacketVerifier;
 import com.syswin.temail.ps.common.packet.PacketDecryptor;
 import com.syswin.temail.ps.common.packet.PacketEncryptor;
 import com.syswin.temail.ps.common.packet.PacketSigner;
@@ -80,8 +76,8 @@ public class PsServer {
   private final PacketDecryptor decryptor;
 
   public PsServer(SessionService sessionService, RequestService requestService, int port, int idleTimeSeconds) {
-    this(sessionService, requestService, port, idleTimeSeconds, new SimpleBodyExtractor(), new NoOpPacketSigner(),
-        new NoOpPacketVerifier(), new NoOpPacketEncryptor(), new NoOpPacketDecryptor());
+    this(sessionService, requestService, port, idleTimeSeconds, new SimpleBodyExtractor(),
+        PacketSigner.NoOp, PacketVerifier.NoOp, PacketEncryptor.NoOp, PacketDecryptor.NoOp);
   }
 
   public PsServer(SessionService sessionService, RequestService requestService, int port,

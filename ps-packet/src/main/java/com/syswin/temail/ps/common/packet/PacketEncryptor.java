@@ -1,5 +1,7 @@
 package com.syswin.temail.ps.common.packet;
 
+import static com.syswin.temail.ps.common.entity.DataEncryptType.NONE;
+
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import com.syswin.temail.ps.common.entity.DataEncryptType;
 
@@ -9,11 +11,18 @@ import com.syswin.temail.ps.common.entity.DataEncryptType;
  */
 public interface PacketEncryptor {
 
-  void encrypt(CDTPPacket packet);
+  PacketEncryptor NoOp = new PacketEncryptor() {
+  };
 
-  void encrypt(CDTPPacket packet, DataEncryptType dataEncryptType);
+  default void encrypt(CDTPPacket packet) {
+  }
 
-  DataEncryptType getDefaultDataEncryptType();
+  default void encrypt(CDTPPacket packet, DataEncryptType dataEncryptType) {
+  }
+
+  default DataEncryptType getDefaultDataEncryptType() {
+    return NONE;
+  }
 
   default int getDefaultDataEncryptionMethod() {
     return getDefaultDataEncryptType().getCode();
