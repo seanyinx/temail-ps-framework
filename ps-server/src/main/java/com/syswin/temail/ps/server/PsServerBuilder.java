@@ -8,7 +8,6 @@ import com.syswin.temail.ps.common.packet.KeyAwareEccPacketEncryptor;
 import com.syswin.temail.ps.common.packet.KeyAwareEccPacketSigner;
 import com.syswin.temail.ps.common.packet.KeyAwarePacketDecryptor;
 import com.syswin.temail.ps.common.packet.KeyAwarePacketVerifier;
-import com.syswin.temail.ps.common.packet.PacketDecryptor;
 import com.syswin.temail.ps.common.packet.PacketEncryptor;
 import com.syswin.temail.ps.common.packet.PacketSigner;
 import com.syswin.temail.ps.common.packet.PacketVerifier;
@@ -34,7 +33,6 @@ public class PsServerBuilder {
   private PacketSigner signer;
   private PacketVerifier verifier;
   private PacketEncryptor encryptor;
-  private PacketDecryptor decryptor;
 
   private KeyAwareVault vault;
   private String vaultRegistryUrl;
@@ -50,7 +48,7 @@ public class PsServerBuilder {
   public static PsServer buildFullAuto(@NonNull SessionService sessionService, @NonNull RequestService requestService,
       @NonNull KeyAwareVault vault) {
     return new FullAutoPsServer(sessionService, requestService, DEFAULT_PORT, DEFAULT_IDLE_TIME_SECONDS,
-        new SimpleBodyExtractor(), vault);
+        new SimpleBodyExtractor(new KeyAwarePacketDecryptor(vault)), vault);
   }
 
   /**
@@ -61,7 +59,7 @@ public class PsServerBuilder {
   public PsServer build() {
 
     if (bodyExtractor == null) {
-      bodyExtractor = new SimpleBodyExtractor();
+      bodyExtractor = SimpleBodyExtractor.INSTANCE;
     }
     if (vault == null &&
         StringUtil.hasText(vaultRegistryUrl) &&
@@ -77,12 +75,9 @@ public class PsServerBuilder {
     if (encryptor == null) {
       encryptor = (vault == null) ? PacketEncryptor.NoOp : new KeyAwareEccPacketEncryptor(vault);
     }
-    if (decryptor == null) {
-      decryptor = (vault == null) ? PacketDecryptor.NoOp : new KeyAwarePacketDecryptor(vault);
-    }
 
     return new PsServer(sessionService, requestService, port, idleTimeSeconds,
-        bodyExtractor, signer, verifier, encryptor, decryptor);
+        bodyExtractor, signer, verifier, encryptor);
   }
 
   public PsServerBuilder sessionService(SessionService sessionService) {
@@ -137,11 +132,6 @@ public class PsServerBuilder {
 
   public PsServerBuilder encryptor(PacketEncryptor encryptor) {
     this.encryptor = encryptor;
-    return this;
-  }
-
-  public PsServerBuilder decryptor(PacketDecryptor decryptor) {
-    this.decryptor = decryptor;
     return this;
   }
 

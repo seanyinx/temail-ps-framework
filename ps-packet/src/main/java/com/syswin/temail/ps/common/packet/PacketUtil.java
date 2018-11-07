@@ -1,15 +1,17 @@
-package com.syswin.temail.ps.common.utils;
+package com.syswin.temail.ps.common.packet;
 
 import static com.syswin.temail.ps.common.Constants.LENGTH_FIELD_LENGTH;
 import static com.syswin.temail.ps.common.utils.StringUtil.defaultString;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.syswin.temail.ps.common.codec.BodyExtractor;
-import com.syswin.temail.ps.common.codec.SimpleBodyExtractor;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
+import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
 import com.syswin.temail.ps.common.entity.CDTPProtoBuf;
 import com.syswin.temail.ps.common.exception.PacketException;
+import com.syswin.temail.ps.common.utils.DigestUtil;
+import com.syswin.temail.ps.common.utils.HexUtil;
 import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,32 +20,10 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2018-10-25
  */
 @Slf4j
-public class PacketUtil {
-
-  private static final SimpleBodyExtractor SIMPLE_BODY_EXTRACTOR = new SimpleBodyExtractor();
-
-  /**
-   * 将收到的字节数组的CDTPPacket进行解包，生成Message对象。主要用于单聊、群聊等服务端保留完整Packet的情况
-   *
-   * @param packetData Base64UrlSafe形式的CDTPPacket包，包含前导的长度
-   * @return 解包后的CDTPPacket对象
-   */
-  public static CDTPPacket unpack(String packetData) {
-    return unpack(Base64.getUrlDecoder().decode(packetData), SIMPLE_BODY_EXTRACTOR);
-  }
+public abstract class PacketUtil {
 
   public static CDTPPacket unpack(String packetData, BodyExtractor bodyExtractor) {
     return unpack(Base64.getUrlDecoder().decode(packetData), bodyExtractor);
-  }
-
-  /**
-   * 将收到的字节数组的CDTPPacket进行解包，生成CDTPPacket对象。主要用于单聊、群聊等服务端保留完整Packet的情况
-   *
-   * @param packetData 字节数组形式的CDTPPacket包，包含前导的长度
-   * @return 解包后的CDTPPacket对象
-   */
-  public static CDTPPacket unpack(byte[] packetData) {
-    return unpack(packetData, SIMPLE_BODY_EXTRACTOR);
   }
 
   public static CDTPPacket unpack(byte[] packetData, BodyExtractor bodyExtractor) {
@@ -102,9 +82,9 @@ public class PacketUtil {
     byte[] data = bodyExtractor.fromBuffer(commandSpace, command, byteBuf, packetLength - headerLength - 8);
 
     packet.setData(data);
+    bodyExtractor.decrypt(packet);
     return packet;
   }
-
 
   public static byte[] pack(CDTPPacket packet) {
     return pack(packet, false);
@@ -132,7 +112,6 @@ public class PacketUtil {
     return byteBuf.getBuf();
   }
 
-
   public static String getUnsignData(CDTPPacket packet) {
     CDTPHeader header = packet.getHeader();
     byte[] data = packet.getData();
@@ -144,4 +123,46 @@ public class PacketUtil {
         + dataSha256;
   }
 
+  protected abstract BodyExtractor getBodyExtractor();
+
+  /**
+   * 将收到的字节数组的CDTPPacket进行解包，生成Message对象。主要用于单聊、群聊等服务端保留完整Packet的情况
+   *
+   * @param packetData Base64UrlSafe形式的CDTPPacket包，包含前导的长度
+   * @return 解包后的CDTPPacket对象
+   */
+  public CDTPPacket unpack(String packetData) {
+    return unpack(Base64.getUrlDecoder().decode(packetData), getBodyExtractor());
+  }
+
+  /**
+   * 将收到的字节数组的CDTPPacket进行解包，生成CDTPPacket对象。主要用于单聊、群聊等服务端保留完整Packet的情况
+   *
+   * @param packetData 字节数组形式的CDTPPacket包，包含前导的长度
+   * @return 解包后的CDTPPacket对象
+   */
+  public CDTPPacket unpack(byte[] packetData) {
+    return unpack(packetData, getBodyExtractor());
+  }
+
+  public abstract String encodeData(CDTPPacket packet);
+
+  public abstract byte[] decodeData(CDTPPacketTrans packet);
+
+  public CDTPPacketTrans toTrans(CDTPPacket packet) {
+    if (packet == null) {
+      return null;
+    }
+    return new CDTPPacketTrans(packet.getCommandSpace(), packet.getCommand(), packet.getVersion(),
+        packet.getHeader().clone(), encodeData(packet));
+  }
+
+  public CDTPPacket fromTrans(CDTPPacketTrans packetTrans) {
+    if (packetTrans == null) {
+      return null;
+    }
+    return new CDTPPacket(packetTrans.getCommandSpace(), packetTrans.getCommand(), packetTrans.getVersion(),
+        packetTrans.getHeader().clone(),
+        decodeData(packetTrans));
+  }
 }

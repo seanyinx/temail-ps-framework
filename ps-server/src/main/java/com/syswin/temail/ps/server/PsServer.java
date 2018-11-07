@@ -5,7 +5,6 @@ import com.syswin.temail.ps.common.codec.BodyExtractor;
 import com.syswin.temail.ps.common.codec.PacketDecoder;
 import com.syswin.temail.ps.common.codec.PacketEncoder;
 import com.syswin.temail.ps.common.codec.SimpleBodyExtractor;
-import com.syswin.temail.ps.common.packet.PacketDecryptor;
 import com.syswin.temail.ps.common.packet.PacketEncryptor;
 import com.syswin.temail.ps.common.packet.PacketSigner;
 import com.syswin.temail.ps.common.packet.PacketVerifier;
@@ -73,16 +72,21 @@ public class PsServer {
   private final PacketSigner signer;
   private final PacketVerifier verifier;
   private final PacketEncryptor encryptor;
-  private final PacketDecryptor decryptor;
 
   public PsServer(SessionService sessionService, RequestService requestService, int port, int idleTimeSeconds) {
-    this(sessionService, requestService, port, idleTimeSeconds, new SimpleBodyExtractor(),
-        PacketSigner.NoOp, PacketVerifier.NoOp, PacketEncryptor.NoOp, PacketDecryptor.NoOp);
+    this(sessionService, requestService, port, idleTimeSeconds, SimpleBodyExtractor.INSTANCE,
+        PacketSigner.NoOp, PacketVerifier.NoOp, PacketEncryptor.NoOp);
+  }
+
+  public PsServer(SessionService sessionService, RequestService requestService, int port, int idleTimeSeconds,
+      BodyExtractor bodyExtractor) {
+    this(sessionService, requestService, port, idleTimeSeconds, bodyExtractor,
+        PacketSigner.NoOp, PacketVerifier.NoOp, PacketEncryptor.NoOp);
   }
 
   public PsServer(SessionService sessionService, RequestService requestService, int port,
       int idleTimeSeconds, BodyExtractor bodyExtractor, PacketSigner signer,
-      PacketVerifier verifier, PacketEncryptor encryptor, PacketDecryptor decryptor) {
+      PacketVerifier verifier, PacketEncryptor encryptor) {
     this.idleHandler = new IdleHandler(sessionService);
     this.port = port;
     this.idleTimeSeconds = idleTimeSeconds;
@@ -90,7 +94,6 @@ public class PsServer {
     this.signer = signer;
     this.verifier = verifier;
     this.encryptor = encryptor;
-    this.decryptor = decryptor;
     this.psServerHandler = new PsServerHandler(sessionService, requestService, new HeartBeatService());
   }
 
@@ -120,7 +123,7 @@ public class PsServer {
                 .addLast("lengthFieldPrepender",
                     new LengthFieldPrepender(Constants.LENGTH_FIELD_LENGTH, 0, false))
                 .addLast("packetEncoder", new PacketEncoder(signer, encryptor))
-                .addLast("packetDecoder", new PacketDecoder(bodyExtractor, verifier, decryptor))
+                .addLast("packetDecoder", new PacketDecoder(bodyExtractor, verifier))
                 .addLast("psServerHandler", psServerHandler);
           }
         });

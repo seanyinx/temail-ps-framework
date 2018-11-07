@@ -1,4 +1,4 @@
-package com.syswin.temail.ps.common.utils;
+package com.syswin.temail.ps.common.packet;
 
 import com.syswin.temail.ps.common.exception.PacketException;
 

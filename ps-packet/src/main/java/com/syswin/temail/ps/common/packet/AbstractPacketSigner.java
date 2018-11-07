@@ -2,7 +2,7 @@ package com.syswin.temail.ps.common.packet;
 
 
 import static com.syswin.temail.ps.common.entity.SignatureAlgorithm.NONE;
-import static com.syswin.temail.ps.common.utils.PacketUtil.getUnsignData;
+import static com.syswin.temail.ps.common.packet.PacketUtil.getUnsignData;
 
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
