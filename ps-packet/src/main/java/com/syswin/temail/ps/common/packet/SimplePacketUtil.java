@@ -16,7 +16,11 @@ public class SimplePacketUtil extends PacketUtil {
   private final BodyExtractor bodyExtractor;
 
   private SimplePacketUtil() {
-    this.bodyExtractor = SimpleBodyExtractor.INSTANCE;
+    this(SimpleBodyExtractor.INSTANCE);
+  }
+
+  public SimplePacketUtil(BodyExtractor bodyExtractor) {
+    this.bodyExtractor = bodyExtractor;
   }
 
   @Override
