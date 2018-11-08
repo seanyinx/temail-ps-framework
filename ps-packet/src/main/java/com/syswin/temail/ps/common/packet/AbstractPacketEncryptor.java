@@ -1,6 +1,7 @@
 package com.syswin.temail.ps.common.packet;
 
 import static com.syswin.temail.ps.common.entity.DataEncryptType.NONE;
+import static com.syswin.temail.ps.common.entity.DataEncryptType.NONE_CODE;
 
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
@@ -33,20 +34,25 @@ public abstract class AbstractPacketEncryptor implements PacketEncryptor {
   public void encrypt(CDTPPacket packet, DataEncryptType dataEncryptType) {
     byte[] data;
     CDTPHeader header;
-    if (dataEncryptType != NONE &&
-        packet != null &&
-        ((data = packet.getData()) != null && data.length != 0) &&
-        (header = packet.getHeader()) != null && StringUtil.hasText(header.getReceiver())) {
-      try {
-        packet.setData(encrypt(header.getReceiver(), data, dataEncryptType));
-        header.setDataEncryptionMethod(dataEncryptType.getCode());
-      } catch (Exception e) {
-        String receiverPK;
-        if (StringUtil.hasText(receiverPK = header.getReceiverPK())) {
-          packet.setData(encryptWithPubKey(receiverPK, data, dataEncryptType));
+    if (packet != null && (header = packet.getHeader()) != null) {
+      if (dataEncryptType != NONE &&
+          ((data = packet.getData()) != null && data.length != 0) &&
+          StringUtil.hasText(header.getReceiver())) {
+        try {
+          packet.setData(encrypt(header.getReceiver(), data, dataEncryptType));
           header.setDataEncryptionMethod(dataEncryptType.getCode());
+        } catch (Exception e) {
+          String receiverPK;
+          if (StringUtil.hasText(receiverPK = header.getReceiverPK())) {
+            packet.setData(encryptWithPubKey(receiverPK, data, dataEncryptType));
+            header.setDataEncryptionMethod(dataEncryptType.getCode());
+          } else {
+            // 没有接收的公钥，不加密
+            header.setDataEncryptionMethod(NONE_CODE);
+          }
         }
-        // 没有接收的公钥，不加密
+      } else {
+        header.setDataEncryptionMethod(NONE_CODE);
       }
     }
   }

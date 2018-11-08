@@ -2,6 +2,7 @@ package com.syswin.temail.ps.common.packet;
 
 
 import static com.syswin.temail.ps.common.entity.SignatureAlgorithm.NONE;
+import static com.syswin.temail.ps.common.entity.SignatureAlgorithm.NONE_CODE;
 import static com.syswin.temail.ps.common.packet.PacketUtil.getUnsignData;
 
 import com.syswin.temail.ps.common.entity.CDTPHeader;
@@ -39,7 +40,9 @@ public abstract class AbstractPacketSigner implements PacketSigner {
         header.setSignature(sign(header.getSender(), unsignData, algorithm));
         header.setSignatureAlgorithm(algorithm.getCode());
       } catch (Exception e) {
-        // 无法获取并使用私钥进行签名，则不签名
+        // 无法获取私钥进行签名，则不签名
+        header.setSignature(null);
+        header.setSignatureAlgorithm(NONE_CODE);
       }
     }
   }
