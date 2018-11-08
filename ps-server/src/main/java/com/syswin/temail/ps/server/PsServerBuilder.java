@@ -4,9 +4,9 @@ import com.syswin.temail.kms.vault.KeyAwareVault;
 import com.syswin.temail.kms.vault.VaultKeeper;
 import com.syswin.temail.ps.common.codec.BodyExtractor;
 import com.syswin.temail.ps.common.codec.SimpleBodyExtractor;
-import com.syswin.temail.ps.common.packet.KeyAwareEccPacketEncryptor;
-import com.syswin.temail.ps.common.packet.KeyAwareEccPacketSigner;
 import com.syswin.temail.ps.common.packet.KeyAwarePacketDecryptor;
+import com.syswin.temail.ps.common.packet.KeyAwarePacketEncryptor;
+import com.syswin.temail.ps.common.packet.KeyAwarePacketSigner;
 import com.syswin.temail.ps.common.packet.KeyAwarePacketVerifier;
 import com.syswin.temail.ps.common.packet.PacketEncryptor;
 import com.syswin.temail.ps.common.packet.PacketSigner;
@@ -67,13 +67,13 @@ public class PsServerBuilder {
       vault = VaultKeeper.keyAwareVault(vaultRegistryUrl, tenantId);
     }
     if (signer == null) {
-      signer = (vault == null) ? PacketSigner.NoOp : new KeyAwareEccPacketSigner(vault);
+      signer = (vault == null) ? PacketSigner.NoOp : new KeyAwarePacketSigner(vault);
     }
     if (verifier == null) {
       verifier = (vault == null) ? PacketVerifier.NoOp : new KeyAwarePacketVerifier(vault);
     }
     if (encryptor == null) {
-      encryptor = (vault == null) ? PacketEncryptor.NoOp : new KeyAwareEccPacketEncryptor(vault);
+      encryptor = (vault == null) ? PacketEncryptor.NoOp : new KeyAwarePacketEncryptor(vault);
     }
 
     return new PsServer(sessionService, requestService, port, idleTimeSeconds,

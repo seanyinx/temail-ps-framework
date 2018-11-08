@@ -35,8 +35,12 @@ public abstract class AbstractPacketSigner implements PacketSigner {
         packet != null &&
         (header = packet.getHeader()) != null) {
       String unsignData = getUnsignData(packet);
-      header.setSignature(sign(header.getSender(), unsignData, algorithm));
-      header.setSignatureAlgorithm(algorithm.getCode());
+      try {
+        header.setSignature(sign(header.getSender(), unsignData, algorithm));
+        header.setSignatureAlgorithm(algorithm.getCode());
+      } catch (Exception e) {
+        // 无法获取并使用私钥进行签名，则不签名
+      }
     }
   }
 }

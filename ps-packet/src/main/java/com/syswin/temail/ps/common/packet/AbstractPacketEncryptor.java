@@ -5,6 +5,7 @@ import static com.syswin.temail.ps.common.entity.DataEncryptType.NONE;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import com.syswin.temail.ps.common.entity.DataEncryptType;
+import com.syswin.temail.ps.common.utils.StringUtil;
 
 /**
  * @author 姚华成
@@ -21,6 +22,8 @@ public abstract class AbstractPacketEncryptor implements PacketEncryptor {
    */
   public abstract byte[] encrypt(String userId, byte[] data, DataEncryptType dataEncryptType);
 
+  public abstract byte[] encryptWithPubKey(String publicKey, byte[] data, DataEncryptType dataEncryptType);
+
   @Override
   public void encrypt(CDTPPacket packet) {
     encrypt(packet, getDefaultDataEncryptType());
@@ -33,9 +36,18 @@ public abstract class AbstractPacketEncryptor implements PacketEncryptor {
     if (dataEncryptType != NONE &&
         packet != null &&
         ((data = packet.getData()) != null && data.length != 0) &&
-        (header = packet.getHeader()) != null) {
-      packet.setData(encrypt(header.getReceiver(), data, dataEncryptType));
-      header.setDataEncryptionMethod(dataEncryptType.getCode());
+        (header = packet.getHeader()) != null && StringUtil.hasText(header.getReceiver())) {
+      try {
+        packet.setData(encrypt(header.getReceiver(), data, dataEncryptType));
+        header.setDataEncryptionMethod(dataEncryptType.getCode());
+      } catch (Exception e) {
+        String receiverPK;
+        if (StringUtil.hasText(receiverPK = header.getReceiverPK())) {
+          packet.setData(encryptWithPubKey(receiverPK, data, dataEncryptType));
+          header.setDataEncryptionMethod(dataEncryptType.getCode());
+        }
+        // 没有接收的公钥，不加密
+      }
     }
   }
 }

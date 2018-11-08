@@ -8,6 +8,7 @@ import static com.syswin.temail.ps.common.packet.PacketUtil.getUnsignData;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import com.syswin.temail.ps.common.entity.SignatureAlgorithm;
+import com.syswin.temail.ps.common.utils.StringUtil;
 
 /**
  * @author 姚华成
@@ -26,6 +27,9 @@ public abstract class AbstractPacketVerifier implements PacketVerifier {
   public abstract boolean verify(String userId, String unsignData, String signature,
       SignatureAlgorithm algorithm);
 
+  public abstract boolean verifyWithPubKey(String publicKey, String unsignData, String signature,
+      SignatureAlgorithm algorithm);
+
   @Override
   public boolean verify(CDTPPacket packet) {
     CDTPHeader header;
@@ -34,8 +38,17 @@ public abstract class AbstractPacketVerifier implements PacketVerifier {
         (header = packet.getHeader()) != null &&
         (algorithm = valueOf(header.getSignatureAlgorithm())) != NONE) {
       String unsignData = getUnsignData(packet);
-      return verify(header.getSender(), unsignData, header.getSignature(), algorithm);
+      String signature = header.getSignature();
+      try {
+        return verify(header.getSender(), unsignData, signature, algorithm);
+      } catch (Exception e) {
+        String senderPK;
+        if (StringUtil.hasText(senderPK = header.getSenderPK())) {
+          return verifyWithPubKey(senderPK, unsignData, signature, algorithm);
+        }
+        return false;
+      }
     }
-    return false;
+    return true;
   }
 }

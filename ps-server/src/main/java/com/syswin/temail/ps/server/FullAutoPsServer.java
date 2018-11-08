@@ -2,8 +2,8 @@ package com.syswin.temail.ps.server;
 
 import com.syswin.temail.kms.vault.KeyAwareVault;
 import com.syswin.temail.ps.common.codec.BodyExtractor;
-import com.syswin.temail.ps.common.packet.KeyAwareEccPacketEncryptor;
-import com.syswin.temail.ps.common.packet.KeyAwareEccPacketSigner;
+import com.syswin.temail.ps.common.packet.KeyAwarePacketEncryptor;
+import com.syswin.temail.ps.common.packet.KeyAwarePacketSigner;
 import com.syswin.temail.ps.common.packet.KeyAwarePacketVerifier;
 import com.syswin.temail.ps.server.service.RequestService;
 import com.syswin.temail.ps.server.service.SessionService;
@@ -18,7 +18,7 @@ public class FullAutoPsServer extends PsServer {
       RequestService requestService, int port, int idleTimeSeconds,
       BodyExtractor bodyExtractor, KeyAwareVault vault) {
     super(sessionService, requestService, port, idleTimeSeconds, bodyExtractor,
-        new KeyAwareEccPacketSigner(vault), new KeyAwarePacketVerifier(vault),
-        new KeyAwareEccPacketEncryptor(vault));
+        new KeyAwarePacketSigner(vault), new KeyAwarePacketVerifier(vault),
+        new KeyAwarePacketEncryptor(vault));
   }
 }

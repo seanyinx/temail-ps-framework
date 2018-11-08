@@ -82,7 +82,12 @@ public abstract class PacketUtil {
     byte[] data = bodyExtractor.fromBuffer(commandSpace, command, byteBuf, packetLength - headerLength - 8);
 
     packet.setData(data);
-    bodyExtractor.decrypt(packet);
+    try {
+      bodyExtractor.decrypt(packet);
+    } catch (Exception e) {
+      // 解密失败，招聘异常
+      throw new PacketException("数据解密失败！", e, packet);
+    }
     return packet;
   }
 
