@@ -1,17 +1,12 @@
 package com.syswin.temail.ps.server;
 
 import com.syswin.temail.kms.vault.KeyAwareVault;
-import com.syswin.temail.kms.vault.VaultKeeper;
 import com.syswin.temail.ps.common.codec.BodyExtractor;
 import com.syswin.temail.ps.common.codec.SimpleBodyExtractor;
 import com.syswin.temail.ps.common.packet.KeyAwarePacketDecryptor;
-import com.syswin.temail.ps.common.packet.KeyAwarePacketEncryptor;
-import com.syswin.temail.ps.common.packet.KeyAwarePacketSigner;
-import com.syswin.temail.ps.common.packet.KeyAwarePacketVerifier;
 import com.syswin.temail.ps.common.packet.PacketEncryptor;
 import com.syswin.temail.ps.common.packet.PacketSigner;
 import com.syswin.temail.ps.common.packet.PacketVerifier;
-import com.syswin.temail.ps.common.utils.StringUtil;
 import com.syswin.temail.ps.server.service.RequestService;
 import com.syswin.temail.ps.server.service.SessionService;
 import lombok.NonNull;
@@ -34,10 +29,6 @@ public class PsServerBuilder {
   private PacketVerifier verifier;
   private PacketEncryptor encryptor;
 
-  private KeyAwareVault vault;
-  private String vaultRegistryUrl;
-  private String tenantId;
-
   public PsServerBuilder() {
   }
 
@@ -58,22 +49,17 @@ public class PsServerBuilder {
    */
   public PsServer build() {
 
-    if (bodyExtractor == null) {
-      bodyExtractor = SimpleBodyExtractor.INSTANCE;
-    }
-    if (vault == null &&
-        StringUtil.hasText(vaultRegistryUrl) &&
-        StringUtil.hasText(tenantId)) {
-      vault = VaultKeeper.keyAwareVault(vaultRegistryUrl, tenantId);
-    }
     if (signer == null) {
-      signer = (vault == null) ? PacketSigner.NoOp : new KeyAwarePacketSigner(vault);
+      signer = PacketSigner.NoOp;
     }
     if (verifier == null) {
-      verifier = (vault == null) ? PacketVerifier.NoOp : new KeyAwarePacketVerifier(vault);
+      verifier = PacketVerifier.NoOp;
     }
     if (encryptor == null) {
-      encryptor = (vault == null) ? PacketEncryptor.NoOp : new KeyAwarePacketEncryptor(vault);
+      encryptor = PacketEncryptor.NoOp;
+    }
+    if (bodyExtractor == null) {
+      bodyExtractor = SimpleBodyExtractor.INSTANCE;
     }
 
     return new PsServer(sessionService, requestService, port, idleTimeSeconds,
@@ -100,23 +86,8 @@ public class PsServerBuilder {
     return this;
   }
 
-  public PsServerBuilder vaultRegistryUrl(String vaultRegistryUrl) {
-    this.vaultRegistryUrl = vaultRegistryUrl;
-    return this;
-  }
-
-  public PsServerBuilder tenantId(String tenantId) {
-    this.tenantId = tenantId;
-    return this;
-  }
-
   public PsServerBuilder bodyExtractor(BodyExtractor bodyExtractor) {
     this.bodyExtractor = bodyExtractor;
-    return this;
-  }
-
-  public PsServerBuilder vault(KeyAwareVault vault) {
-    this.vault = vault;
     return this;
   }
 
@@ -134,5 +105,4 @@ public class PsServerBuilder {
     this.encryptor = encryptor;
     return this;
   }
-
 }
