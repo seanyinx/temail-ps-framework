@@ -11,6 +11,7 @@
   <artifactId>temail-ps-server</artifactId>
   <version>1.2.0-SNAPSHOT</version>
   <modules>
+    <module>ps-protocol</module>
     <module>ps-packet</module>
     <module>ps-common</module>
     <module>ps-client</module>
@@ -40,6 +41,11 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>com.syswin.temail</groupId>
+        <artifactId>ps-protocol</artifactId>
+        <version>${ps.version}</version>
+      </dependency>
       <dependency>
         <groupId>com.syswin.temail</groupId>
         <artifactId>ps-common</artifactId>

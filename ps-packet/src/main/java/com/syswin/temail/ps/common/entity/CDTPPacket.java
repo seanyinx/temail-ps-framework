@@ -38,7 +38,7 @@ public final class CDTPPacket {
     }
   }
 
-  public boolean isHearbeat() {
+  public boolean isHeartbeat() {
     return commandSpace == CHANNEL_CODE &&
         (command == PING_CODE || command == PONG_CODE);
   }

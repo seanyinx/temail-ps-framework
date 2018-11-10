@@ -27,6 +27,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -134,10 +135,8 @@ public class PsServer {
   private final PsServerHandler psServerHandler;
   private final int port;
   private final int idleTimeSeconds;
-  private final BodyExtractor bodyExtractor;
-  private final PacketSigner signer;
-  private final PacketVerifier verifier;
-  private final PacketEncryptor encryptor;
+  private final PacketEncoder packetEncoder;
+  private final ByteToMessageDecoder packetDecoder;
 
   public PsServer(SessionService sessionService, RequestService requestService, int port, int idleTimeSeconds) {
     this(sessionService, requestService, port, idleTimeSeconds, SimpleBodyExtractor.INSTANCE,
@@ -153,14 +152,27 @@ public class PsServer {
   public PsServer(SessionService sessionService, RequestService requestService, int port,
       int idleTimeSeconds, BodyExtractor bodyExtractor, PacketSigner signer,
       PacketVerifier verifier, PacketEncryptor encryptor) {
+    this(sessionService,
+        requestService,
+        port,
+        idleTimeSeconds,
+        new PacketEncoder(signer, encryptor),
+        new PacketDecoder(bodyExtractor, verifier));
+  }
+
+  public PsServer(SessionService sessionService,
+      RequestService requestService,
+      int port,
+      int idleTimeSeconds,
+      PacketEncoder packetEncoder,
+      ByteToMessageDecoder packetDecoder) {
+
     this.idleHandler = new IdleHandler(sessionService);
     this.port = port;
     this.idleTimeSeconds = idleTimeSeconds;
-    this.bodyExtractor = bodyExtractor;
-    this.signer = signer;
-    this.verifier = verifier;
-    this.encryptor = encryptor;
     this.psServerHandler = new PsServerHandler(sessionService, requestService, new HeartBeatService());
+    this.packetEncoder = packetEncoder;
+    this.packetDecoder = packetDecoder;
   }
 
   /**
@@ -201,8 +213,8 @@ public class PsServer {
                     new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, Constants.LENGTH_FIELD_LENGTH, 0, 0))
                 .addLast("lengthFieldPrepender",
                     new LengthFieldPrepender(Constants.LENGTH_FIELD_LENGTH, 0, false))
-                .addLast("packetEncoder", new PacketEncoder(signer, encryptor))
-                .addLast("packetDecoder", new PacketDecoder(bodyExtractor, verifier))
+                .addLast("packetEncoder", packetEncoder)
+                .addLast("packetDecoder", packetDecoder)
                 .addLast("psServerHandler", psServerHandler);
           }
         });
