@@ -10,6 +10,7 @@ import com.syswin.temail.ps.common.packet.KeyAwarePacketEncryptor;
 import com.syswin.temail.ps.common.packet.KeyAwarePacketSigner;
 import com.syswin.temail.ps.common.packet.KeyAwarePacketVerifier;
 import com.syswin.temail.ps.common.packet.PacketDecryptor;
+import com.syswin.temail.ps.common.entity.CDTPPacket;
 import com.syswin.temail.ps.common.packet.PacketEncryptor;
 import com.syswin.temail.ps.common.packet.PacketSigner;
 import com.syswin.temail.ps.common.packet.PacketVerifier;
@@ -30,6 +31,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import java.net.InetSocketAddress;
 import lombok.extern.slf4j.Slf4j;
@@ -135,7 +137,7 @@ public class PsServer {
   private final PsServerHandler psServerHandler;
   private final int port;
   private final int idleTimeSeconds;
-  private final PacketEncoder packetEncoder;
+  private final MessageToByteEncoder<CDTPPacket> packetEncoder;
   private final ByteToMessageDecoder packetDecoder;
 
   public PsServer(SessionService sessionService, RequestService requestService, int port, int idleTimeSeconds) {
@@ -164,7 +166,7 @@ public class PsServer {
       RequestService requestService,
       int port,
       int idleTimeSeconds,
-      PacketEncoder packetEncoder,
+      MessageToByteEncoder<CDTPPacket> packetEncoder,
       ByteToMessageDecoder packetDecoder) {
 
     this.idleHandler = new IdleHandler(sessionService);
