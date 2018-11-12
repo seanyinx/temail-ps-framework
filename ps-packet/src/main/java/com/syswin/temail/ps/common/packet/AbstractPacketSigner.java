@@ -2,12 +2,13 @@ package com.syswin.temail.ps.common.packet;
 
 
 import static com.syswin.temail.ps.common.entity.SignatureAlgorithm.NONE;
-import static com.syswin.temail.ps.common.entity.SignatureAlgorithm.NONE_CODE;
+import static com.syswin.temail.ps.common.entity.SignatureAlgorithm.valueOf;
 import static com.syswin.temail.ps.common.packet.PacketUtil.getUnsignData;
 
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import com.syswin.temail.ps.common.entity.SignatureAlgorithm;
+import com.syswin.temail.ps.common.exception.PacketException;
 
 /**
  * @author 姚华成
@@ -26,23 +27,15 @@ public abstract class AbstractPacketSigner implements PacketSigner {
 
   @Override
   public void sign(CDTPPacket packet) {
-    sign(packet, getDefaultAlgorithm());
-  }
-
-  @Override
-  public void sign(CDTPPacket packet, SignatureAlgorithm algorithm) {
     CDTPHeader header;
-    if (algorithm != NONE &&
-        packet != null &&
-        (header = packet.getHeader()) != null) {
+    SignatureAlgorithm algorithm;
+    if (packet != null && (header = packet.getHeader()) != null &&
+        (algorithm = valueOf(header.getSignatureAlgorithm())) != NONE) {
       String unsignData = getUnsignData(packet);
       try {
         header.setSignature(sign(header.getSender(), unsignData, algorithm));
-        header.setSignatureAlgorithm(algorithm.getCode());
       } catch (Exception e) {
-        // 无法获取私钥进行签名，则不签名
-        header.setSignature(null);
-        header.setSignatureAlgorithm(NONE_CODE);
+        throw new PacketException("签名失败！", e, packet);
       }
     }
   }

@@ -16,6 +16,9 @@ import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * CDTPPacket操作的工具类<br>
+ * 可以对CDTPPacket包进行封包解包，Data编码、解码，与CDTPPacketTrans的转换以及获取待签名数据等操作<br>
+ *
  * @author 姚华成
  * @date 2018-10-25
  */
@@ -150,9 +153,9 @@ public abstract class PacketUtil {
     return unpack(packetData, getBodyExtractor());
   }
 
-  public abstract String encodeData(CDTPPacket packet);
+  protected abstract String encodeData(CDTPPacket packet);
 
-  public abstract byte[] decodeData(CDTPPacketTrans packet);
+  protected abstract byte[] decodeData(CDTPPacketTrans packet);
 
   public CDTPPacketTrans toTrans(CDTPPacket packet) {
     if (packet == null) {

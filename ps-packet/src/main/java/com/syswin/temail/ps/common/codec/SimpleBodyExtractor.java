@@ -4,6 +4,10 @@ import com.syswin.temail.ps.common.entity.CDTPPacket;
 import com.syswin.temail.ps.common.packet.ByteBuf;
 import com.syswin.temail.ps.common.packet.PacketDecryptor;
 
+/**
+ * BodyExtractor的默认实现，能解决绝大部分需求。如果没有解密需求，可以直接使用实例INSTANCE<br>
+ * 其中PacketDecryptor是解密器，根据具体的解密算法实现。如果不解密，使用{@link PacketDecryptor#NoOp}
+ */
 public class SimpleBodyExtractor implements BodyExtractor {
 
   public static final SimpleBodyExtractor INSTANCE = new SimpleBodyExtractor();

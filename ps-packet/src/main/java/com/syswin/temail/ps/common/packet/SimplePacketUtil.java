@@ -7,6 +7,9 @@ import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
 import java.nio.charset.StandardCharsets;
 
 /**
+ * PacketUtil工具的一个简单实现<br>
+ * 静态实例INSTANCE是最基本的实现
+ *
  * @author 姚华成
  * @date 2018-11-05
  */
@@ -29,7 +32,7 @@ public class SimplePacketUtil extends PacketUtil {
   }
 
   @Override
-  public String encodeData(CDTPPacket packet) {
+  protected String encodeData(CDTPPacket packet) {
     byte[] data;
     if (packet == null || (data = packet.getData()) == null) {
       return "";
@@ -38,7 +41,7 @@ public class SimplePacketUtil extends PacketUtil {
   }
 
   @Override
-  public byte[] decodeData(CDTPPacketTrans packet) {
+  protected byte[] decodeData(CDTPPacketTrans packet) {
     String data;
     if (packet == null || (data = packet.getData()) == null) {
       return new byte[0];

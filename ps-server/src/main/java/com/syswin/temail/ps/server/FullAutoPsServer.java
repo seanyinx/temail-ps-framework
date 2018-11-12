@@ -9,6 +9,8 @@ import com.syswin.temail.ps.server.service.RequestService;
 import com.syswin.temail.ps.server.service.SessionService;
 
 /**
+ * 本类与PsServer的区别主要在于本类使用kms系统进行管理的自动加密解密签名验签能力。
+ *
  * @author 姚华成
  * @date 2018-11-06
  */
