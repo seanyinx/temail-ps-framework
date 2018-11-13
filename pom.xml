@@ -159,6 +159,13 @@
         <version>${awaitility.version}</version>
         <scope>test</scope>
       </dependency>
+      <dependency>
+        <groupId>com.syswin.temail</groupId>
+        <artifactId>ps-packet</artifactId>
+        <version>${ps.version}</version>
+        <scope>test</scope>
+        <type>test-jar</type>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
