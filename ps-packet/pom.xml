@@ -6,9 +6,7 @@
     <artifactId>temail-ps-server</artifactId>
     <version>1.1.0-SNAPSHOT</version>
   </parent>
-
   <artifactId>ps-packet</artifactId>
-  <version>1.1.0-SNAPSHOT</version>
 
   <dependencies>
     <dependency>
