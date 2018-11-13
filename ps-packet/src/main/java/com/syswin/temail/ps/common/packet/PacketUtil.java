@@ -124,7 +124,7 @@ public abstract class PacketUtil {
     CDTPHeader header = packet.getHeader();
     byte[] data = packet.getData();
     String targetAddress = defaultString(header.getTargetAddress());
-    String dataSha256 = data == null ? "" : HexUtil.encodeHex(DigestUtil.sha256(data));
+    String dataSha256 = (data == null || data.length == 0) ? "" : HexUtil.encodeHex(DigestUtil.sha256(data));
     return String.valueOf(packet.getCommandSpace() + packet.getCommand())
         + targetAddress
         + String.valueOf(header.getTimestamp())
