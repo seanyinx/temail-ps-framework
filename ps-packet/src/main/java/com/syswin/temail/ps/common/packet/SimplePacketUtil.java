@@ -32,7 +32,7 @@ public class SimplePacketUtil extends PacketUtil {
   }
 
   @Override
-  protected String encodeData(CDTPPacket packet) {
+  public String encodeData(CDTPPacket packet) {
     byte[] data;
     if (packet == null || (data = packet.getData()) == null) {
       return "";
@@ -41,7 +41,7 @@ public class SimplePacketUtil extends PacketUtil {
   }
 
   @Override
-  protected byte[] decodeData(CDTPPacketTrans packet) {
+  public byte[] decodeData(CDTPPacketTrans packet) {
     String data;
     if (packet == null || (data = packet.getData()) == null) {
       return new byte[0];

@@ -153,9 +153,9 @@ public abstract class PacketUtil {
     return unpack(packetData, getBodyExtractor());
   }
 
-  protected abstract String encodeData(CDTPPacket packet);
+  public abstract String encodeData(CDTPPacket packet);
 
-  protected abstract byte[] decodeData(CDTPPacketTrans packet);
+  public abstract byte[] decodeData(CDTPPacketTrans packet);
 
   public CDTPPacketTrans toTrans(CDTPPacket packet) {
     if (packet == null) {
