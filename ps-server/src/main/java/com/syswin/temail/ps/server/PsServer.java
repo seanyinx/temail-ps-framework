@@ -1,39 +1,24 @@
 package com.syswin.temail.ps.server;
 
-import com.syswin.temail.ps.common.Constants;
 import com.syswin.temail.ps.common.codec.BodyExtractor;
 import com.syswin.temail.ps.common.codec.PacketDecoder;
 import com.syswin.temail.ps.common.codec.PacketEncoder;
 import com.syswin.temail.ps.common.codec.SimpleBodyExtractor;
+import com.syswin.temail.ps.common.entity.CDTPPacket;
 import com.syswin.temail.ps.common.packet.KeyAwarePacketDecryptor;
 import com.syswin.temail.ps.common.packet.KeyAwarePacketEncryptor;
 import com.syswin.temail.ps.common.packet.KeyAwarePacketSigner;
 import com.syswin.temail.ps.common.packet.KeyAwarePacketVerifier;
 import com.syswin.temail.ps.common.packet.PacketDecryptor;
-import com.syswin.temail.ps.common.entity.CDTPPacket;
 import com.syswin.temail.ps.common.packet.PacketEncryptor;
 import com.syswin.temail.ps.common.packet.PacketSigner;
 import com.syswin.temail.ps.common.packet.PacketVerifier;
 import com.syswin.temail.ps.common.packet.PublicKeyPacketEncryptor;
 import com.syswin.temail.ps.common.packet.PublicKeyPacketVerifier;
-import com.syswin.temail.ps.server.handler.IdleHandler;
-import com.syswin.temail.ps.server.handler.PsServerHandler;
-import com.syswin.temail.ps.server.service.HeartBeatService;
 import com.syswin.temail.ps.server.service.RequestService;
 import com.syswin.temail.ps.server.service.SessionService;
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.handler.timeout.IdleStateHandler;
-import java.net.InetSocketAddress;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -133,12 +118,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PsServer {
 
-  private final IdleHandler idleHandler;
-  private final PsServerHandler psServerHandler;
-  private final int port;
-  private final int idleTimeSeconds;
-  private final MessageToByteEncoder<CDTPPacket> packetEncoder;
-  private final ByteToMessageDecoder packetDecoder;
+  private final GatewayServer gatewayServer;
 
   public PsServer(SessionService sessionService, RequestService requestService, int port, int idleTimeSeconds) {
     this(sessionService, requestService, port, idleTimeSeconds, SimpleBodyExtractor.INSTANCE,
@@ -162,19 +142,19 @@ public class PsServer {
         new PacketDecoder(bodyExtractor, verifier));
   }
 
-  public PsServer(SessionService sessionService,
+  private PsServer(SessionService sessionService,
       RequestService requestService,
       int port,
       int idleTimeSeconds,
       MessageToByteEncoder<CDTPPacket> packetEncoder,
       ByteToMessageDecoder packetDecoder) {
 
-    this.idleHandler = new IdleHandler(sessionService);
-    this.port = port;
-    this.idleTimeSeconds = idleTimeSeconds;
-    this.psServerHandler = new PsServerHandler(sessionService, requestService, new HeartBeatService());
-    this.packetEncoder = packetEncoder;
-    this.packetDecoder = packetDecoder;
+    gatewayServer = new GatewayServer(
+        sessionService,
+        requestService,
+        packetEncoder, packetDecoder, port,
+        idleTimeSeconds
+    );
   }
 
   /**
@@ -183,47 +163,15 @@ public class PsServer {
    * @deprecated 使用 {@link #start }替换
    */
   @Deprecated
-  public void run() {
-    this.start();
+  public Stoppable run() {
+    return this.start();
   }
 
   /**
    * 启动PsServer
    */
-  public void start() {
-    EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-    EventLoopGroup workerGroup = new NioEventLoopGroup();// 默认 cup
-
-    ServerBootstrap bootstrap = new ServerBootstrap();
-
-    bootstrap.group(bossGroup, workerGroup)
-        // 使用指定端口设置套接字地址
-        .channel(NioServerSocketChannel.class)
-        // 指定使用NIO传输Channel
-        .localAddress(new InetSocketAddress(port))
-        // 通过NoDelay禁用Nagle,使消息立即发送出去
-        .childOption(ChannelOption.TCP_NODELAY, true)
-        // 保持长连接状态
-        .childOption(ChannelOption.SO_KEEPALIVE, true)
-        .childHandler(new ChannelInitializer<SocketChannel>() {
-          @Override
-          protected void initChannel(SocketChannel channel) {
-            channel.pipeline()
-                .addLast("idleStateHandler", new IdleStateHandler(idleTimeSeconds, 0, 0))
-                .addLast("idleHandler", idleHandler)
-                .addLast("lengthFieldBasedFrameDecoder",
-                    new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, Constants.LENGTH_FIELD_LENGTH, 0, 0))
-                .addLast("lengthFieldPrepender",
-                    new LengthFieldPrepender(Constants.LENGTH_FIELD_LENGTH, 0, false))
-                .addLast("packetEncoder", packetEncoder)
-                .addLast("packetDecoder", packetDecoder)
-                .addLast("psServerHandler", psServerHandler);
-          }
-        });
-
-    // 异步地绑定服务器;调用sync方法阻塞等待直到绑定完成
-    bootstrap.bind().syncUninterruptibly();
-    log.info("Temail 服务器已启动,端口号：{}", port);
+  public Stoppable start() {
+    return gatewayServer.run();
   }
 
 }

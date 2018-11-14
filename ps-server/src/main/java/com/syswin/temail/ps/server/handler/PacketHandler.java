@@ -22,13 +22,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Sharable
-public class PsServerHandler extends SimpleChannelInboundHandler<CDTPPacket> {
+public class PacketHandler extends SimpleChannelInboundHandler<CDTPPacket> {
 
   private final SessionService sessionService;
   private final RequestService requestService;
   private final HeartBeatService heartBeatService;
 
-  public PsServerHandler(
+  public PacketHandler(
       SessionService sessionService,
       RequestService requestService,
       HeartBeatService heartBeatService) {
