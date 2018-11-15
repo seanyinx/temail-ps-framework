@@ -1,31 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.0.5.RELEASE</version>
-  </parent>
 
   <groupId>com.syswin.temail</groupId>
-  <artifactId>temail-ps-server</artifactId>
+  <artifactId>temail-ps-framework</artifactId>
   <version>1.2.0-SNAPSHOT</version>
   <modules>
     <module>ps-protocol</module>
-    <module>ps-packet</module>
-    <module>ps-common</module>
-    <module>ps-client</module>
-    <module>ps-server</module>
-    <module>ps-all</module>
+    <module>ps-protocol-java</module>
+    <module>ps-framework</module>
   </modules>
   <packaging>pom</packaging>
 
   <properties>
     <protobuf-java.version>3.6.1</protobuf-java.version>
-    <rocketmq-client.version>4.3.0</rocketmq-client.version>
-    <pact.version>3.5.20</pact.version>
-    <zookeeper.version>3.3.6</zookeeper.version>
-    <spring.boot.version>2.0.4.RELEASE</spring.boot.version>
     <ps.version>1.2.0-SNAPSHOT</ps.version>
     <awaitility.version>3.0.0</awaitility.version>
     <unit-scaffolding.version>1.0.0</unit-scaffolding.version>
@@ -48,44 +36,19 @@
       </dependency>
       <dependency>
         <groupId>com.syswin.temail</groupId>
-        <artifactId>ps-common</artifactId>
+        <artifactId>ps-protocol-java</artifactId>
         <version>${ps.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.syswin.temail</groupId>
-        <artifactId>ps-server</artifactId>
-        <version>${ps.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.syswin.temail</groupId>
-        <artifactId>ps-client</artifactId>
-        <version>${ps.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.syswin.temail</groupId>
-        <artifactId>ps-packet</artifactId>
-        <version>${ps.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.syswin.temail</groupId>
-        <artifactId>temail-channel-registry-client</artifactId>
-        <version>${temail-channel-registry-client.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.systoon.integration</groupId>
-        <artifactId>disconf-spring-boot-starter</artifactId>
-        <version>1.0.0</version>
-      </dependency>
-      <dependency>
-        <groupId>com.baidu.disconf</groupId>
-        <artifactId>disconf-client</artifactId>
-        <version>2.6.36</version>
       </dependency>
       <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-all</artifactId>
         <version>${netty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.25</version>
+        <scope>provided</scope>
       </dependency>
 
       <dependency>
@@ -93,64 +56,11 @@
         <artifactId>protobuf-java</artifactId>
         <version>${protobuf-java.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.apache.rocketmq</groupId>
-        <artifactId>rocketmq-client</artifactId>
-        <version>${rocketmq-client.version}</version>
-      </dependency>
 
-      <dependency>
-        <groupId>com.github.tomakehurst</groupId>
-        <artifactId>wiremock-standalone</artifactId>
-        <version>2.6.0</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.testcontainers</groupId>
-        <artifactId>testcontainers</artifactId>
-        <version>1.7.3</version>
-        <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
       <dependency>
         <groupId>com.github.seanyinx</groupId>
         <artifactId>unit-scaffolding</artifactId>
         <version>${unit-scaffolding.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>au.com.dius</groupId>
-        <artifactId>pact-jvm-consumer_2.11</artifactId>
-        <version>${pact.version}</version>
-        <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>au.com.dius</groupId>
-        <artifactId>pact-jvm-consumer-junit_2.11</artifactId>
-        <version>${pact.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>au.com.dius</groupId>
-        <artifactId>pact-jvm-provider_2.11</artifactId>
-        <version>${pact.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>au.com.dius</groupId>
-        <artifactId>pact-jvm-provider-junit_2.11</artifactId>
-        <version>${pact.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -177,27 +87,27 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-configuration-processor</artifactId>
+      <version>1.16.22</version>
+      <scope>provided</scope>
       <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <version>4.12</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
+      <version>2.18.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
+      <version>3.9.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -276,6 +186,15 @@
             <version>1.8.1</version>
           </dependency>
         </dependencies>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <encoding>UTF-8</encoding>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
       </plugin>
     </plugins>
   </build>
