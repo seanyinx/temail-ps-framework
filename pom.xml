@@ -4,7 +4,7 @@
 
   <groupId>com.syswin.temail</groupId>
   <artifactId>temail-ps-framework</artifactId>
-  <version>1.2.0-SNAPSHOT</version>
+  <version>1.2.0</version>
   <modules>
     <module>ps-protocol</module>
     <module>ps-protocol-java</module>
@@ -14,7 +14,7 @@
 
   <properties>
     <protobuf-java.version>3.6.1</protobuf-java.version>
-    <ps.version>1.2.0-SNAPSHOT</ps.version>
+    <ps.version>1.2.0</ps.version>
     <awaitility.version>3.0.0</awaitility.version>
     <unit-scaffolding.version>1.0.0</unit-scaffolding.version>
     <netty.version>4.1.27.Final</netty.version>
@@ -24,7 +24,7 @@
     <url>http://172.28.4.12/java_temail/temail-ps-server</url>
     <connection>scm:git:git@172.28.4.12:java_temail/temail-ps-server.git</connection>
     <developerConnection>scm:git:git@172.28.4.12:java_temail/temail-ps-server.git</developerConnection>
-    <tag>${project.version}</tag>
+    <tag>v1.2.0</tag>
   </scm>
 
   <dependencyManagement>
