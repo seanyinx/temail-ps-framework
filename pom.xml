@@ -21,10 +21,10 @@
   </properties>
 
   <scm>
-    <url>http://172.28.4.12/java_temail/temail-ps-server</url>
-    <connection>scm:git:git@172.28.4.12:java_temail/temail-ps-server.git</connection>
-    <developerConnection>scm:git:git@172.28.4.12:java_temail/temail-ps-server.git</developerConnection>
-    <tag>v1.2.0</tag>
+    <url>http://172.28.4.12/java_temail/temail-ps-framework</url>
+    <connection>scm:git:git@172.28.4.12:java_temail/temail-ps-framework.git</connection>
+    <developerConnection>scm:git:git@172.28.4.12:java_temail/temail-ps-framework.git</developerConnection>
+    <tag>${project.version}</tag>
   </scm>
 
   <dependencyManagement>
