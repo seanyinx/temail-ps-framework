@@ -4,7 +4,7 @@
 
   <groupId>com.syswin.temail</groupId>
   <artifactId>temail-ps-framework</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.1-SNAPSHOT</version>
   <modules>
     <module>ps-protocol</module>
     <module>ps-protocol-java</module>
@@ -14,7 +14,6 @@
 
   <properties>
     <protobuf-java.version>3.6.1</protobuf-java.version>
-    <ps.version>1.2.0</ps.version>
     <awaitility.version>3.0.0</awaitility.version>
     <unit-scaffolding.version>1.0.0</unit-scaffolding.version>
     <netty.version>4.1.27.Final</netty.version>
@@ -32,12 +31,12 @@
       <dependency>
         <groupId>com.syswin.temail</groupId>
         <artifactId>ps-protocol</artifactId>
-        <version>${ps.version}</version>
+        <version>1.2.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>com.syswin.temail</groupId>
         <artifactId>ps-protocol-java</artifactId>
-        <version>${ps.version}</version>
+        <version>1.2.1-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>io.netty</groupId>
@@ -75,13 +74,6 @@
         <artifactId>awaitility</artifactId>
         <version>${awaitility.version}</version>
         <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.syswin.temail</groupId>
-        <artifactId>ps-packet</artifactId>
-        <version>${ps.version}</version>
-        <scope>test</scope>
-        <type>test-jar</type>
       </dependency>
     </dependencies>
   </dependencyManagement>
