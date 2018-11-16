@@ -21,6 +21,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import java.lang.invoke.MethodHandles;
 import java.net.InetSocketAddress;
+import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,20 +32,20 @@ public class GatewayServer {
   private final PacketHandler packetHandler;
   private final int port;
   private final int idleTimeSeconds;
-  private final MessageToByteEncoder<CDTPPacket> packetEncoder;
-  private final ByteToMessageDecoder packetDecoder;
+  private final Supplier<MessageToByteEncoder<CDTPPacket>> packetEncoderSupplier;
+  private final Supplier<ByteToMessageDecoder> packetDecoderSupplier;
 
   public GatewayServer(SessionService sessionService,
       RequestService requestService,
-      MessageToByteEncoder<CDTPPacket> packetEncoder,
-      ByteToMessageDecoder packetDecoder,
+      Supplier<MessageToByteEncoder<CDTPPacket>> packetEncoderSupplier,
+      Supplier<ByteToMessageDecoder> packetDecoderSupplier,
       int port,
       int idleTimeSeconds) {
 
     this.idleHandler = new IdleHandler(sessionService);
     this.packetHandler = new PacketHandler(sessionService, requestService, new HeartBeatService());
-    this.packetEncoder = packetEncoder;
-    this.packetDecoder = packetDecoder;
+    this.packetEncoderSupplier = packetEncoderSupplier;
+    this.packetDecoderSupplier = packetDecoderSupplier;
     this.port = port;
     this.idleTimeSeconds = idleTimeSeconds;
   }
@@ -74,8 +75,8 @@ public class GatewayServer {
                     new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, Constants.LENGTH_FIELD_LENGTH, 0, 0))
                 .addLast("lengthFieldPrepender",
                     new LengthFieldPrepender(Constants.LENGTH_FIELD_LENGTH, 0, false))
-                .addLast("packetEncoder", packetEncoder)
-                .addLast("packetDecoder", packetDecoder)
+                .addLast("packetEncoder", packetEncoderSupplier.get())
+                .addLast("packetDecoder", packetDecoderSupplier.get())
                 .addLast("packetHandler", packetHandler);
           }
         });
