@@ -55,8 +55,7 @@ public class PacketHandler extends SimpleChannelInboundHandler<CDTPPacket> {
               Integer.toHexString(command));
         }
       } else {
-        // 异步执行绑定动作
-        channel.eventLoop().execute(() -> sessionService.bind(channel, packet));
+        sessionService.bind(channel, packet);
         requestService.handleRequest(packet, channel::writeAndFlush);
       }
     } catch (Exception e) {
