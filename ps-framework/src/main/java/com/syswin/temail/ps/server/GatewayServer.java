@@ -11,6 +11,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -42,7 +43,7 @@ public class GatewayServer {
       int port,
       int idleTimeSeconds) {
 
-    this.idleHandler = new IdleHandler(sessionService);
+    this.idleHandler = new IdleHandler(sessionService, idleTimeSeconds);
     this.packetHandler = new PacketHandler(sessionService, requestService, new HeartBeatService());
     this.packetEncoderSupplier = packetEncoderSupplier;
     this.packetDecoderSupplier = packetDecoderSupplier;
@@ -51,8 +52,18 @@ public class GatewayServer {
   }
 
   public Stoppable run() {
-    EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-    EventLoopGroup workerGroup = new NioEventLoopGroup();// 默认 cpu
+    EventLoopGroup bossGroup;
+    EventLoopGroup workerGroup;// 默认 cpu
+
+    try {
+      bossGroup = new EpollEventLoopGroup(1);
+      workerGroup = new EpollEventLoopGroup();
+      LOGGER.info("Using epoll event loop group");
+    } catch (Throwable t) {
+      bossGroup = new NioEventLoopGroup(1);
+      workerGroup = new NioEventLoopGroup();
+      LOGGER.info("Using Nio event loop group, since epoll is only available on linux");
+    }
 
     ServerBootstrap bootstrap = new ServerBootstrap();
 
@@ -84,6 +95,10 @@ public class GatewayServer {
     // 异步地绑定服务器;调用sync方法阻塞等待直到绑定完成
     bootstrap.bind().syncUninterruptibly();
     LOGGER.info("Temail 服务器已启动,端口号：{}", port);
+    return stoppable(bossGroup, workerGroup);
+  }
+
+  private Stoppable stoppable(EventLoopGroup bossGroup, EventLoopGroup workerGroup) {
     return () -> {
       workerGroup.shutdownGracefully();
       bossGroup.shutdownGracefully();

@@ -18,14 +18,17 @@ import lombok.extern.slf4j.Slf4j;
 public class IdleHandler extends SimpleUserEventChannelHandler<IdleStateEvent> {
 
   private final SessionService sessionService;
+  private final int idleTimeSeconds;
 
-  public IdleHandler(SessionService sessionService) {
+  public IdleHandler(SessionService sessionService, int idleTimeSeconds) {
     this.sessionService = sessionService;
+    this.idleTimeSeconds = idleTimeSeconds;
   }
 
   @Override
   protected void eventReceived(ChannelHandlerContext ctx, IdleStateEvent evt) {
     if (evt.state() == IdleState.READER_IDLE) {
+      log.debug("Closed inactive channel {} after {} seconds", ctx.channel(), idleTimeSeconds);
       Channel channel = ctx.channel();
       sessionService.disconnect(channel);
       channel.close();
@@ -34,6 +37,7 @@ public class IdleHandler extends SimpleUserEventChannelHandler<IdleStateEvent> {
 
   @Override
   public void channelInactive(ChannelHandlerContext ctx) {
+    log.debug("Client closed channel {}", ctx.channel());
     sessionService.disconnect(ctx.channel());
     ctx.channel().close();
   }

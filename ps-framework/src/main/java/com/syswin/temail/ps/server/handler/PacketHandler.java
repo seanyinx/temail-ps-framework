@@ -56,7 +56,7 @@ public class PacketHandler extends SimpleChannelInboundHandler<CDTPPacket> {
         }
       } else {
         sessionService.bind(channel, packet);
-        requestService.handleRequest(packet, channel::writeAndFlush);
+        requestService.handleRequest(packet, msg -> ctx.writeAndFlush(msg, ctx.voidPromise()));
       }
     } catch (Exception e) {
       throw new PacketException(e, packet);
@@ -85,7 +85,7 @@ public class PacketHandler extends SimpleChannelInboundHandler<CDTPPacket> {
         builder.setDesc(cause.getMessage());
       }
       packet.setData(builder.build().toByteArray());
-      ctx.channel().writeAndFlush(packet);
+      ctx.writeAndFlush(packet, ctx.voidPromise());
     }
   }
 }

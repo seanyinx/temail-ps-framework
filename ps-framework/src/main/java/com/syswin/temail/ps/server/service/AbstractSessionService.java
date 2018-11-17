@@ -49,10 +49,14 @@ public abstract class AbstractSessionService implements SessionService {
     CDTPHeader header = reqPacket.getHeader();
     loginExtAsync(reqPacket,
         respPacket -> {
+          log.debug("User {} on device {} logged in successfully", header.getSender(), header.getDeviceId());
           channelHolder.addSession(header.getSender(), header.getDeviceId(), channel);
-          channel.writeAndFlush(respPacket);
+          channel.writeAndFlush(respPacket, channel.voidPromise());
         },
-        channel::writeAndFlush);
+        msg -> {
+          log.debug("User {} on device {} logged in failed", header.getSender(), header.getDeviceId());
+          channel.writeAndFlush(msg, channel.voidPromise());
+        });
   }
 
   @Override
@@ -64,8 +68,10 @@ public abstract class AbstractSessionService implements SessionService {
       return;
     }
     loginExtAsync(reqPacket,
-        respPacket ->
-            channelHolder.addSession(temail, deviceId, channel),
+        respPacket -> {
+          log.debug("User {} on device {} logged in successfully", temail, deviceId);
+          channelHolder.addSession(temail, deviceId, channel);
+        },
         respPacket -> {
           // 自动绑定操作，登录失败不需要处理
         });
@@ -76,8 +82,9 @@ public abstract class AbstractSessionService implements SessionService {
     CDTPHeader header = packet.getHeader();
     CDTPPacket respPacket = new CDTPPacket(packet);
     logoutExt(packet, respPacket);
-    channel.writeAndFlush(respPacket);
+    channel.writeAndFlush(respPacket, channel.voidPromise());
     channelHolder.removeSession(header.getSender(), header.getDeviceId(), channel);
+    log.debug("User {} on device {} logged out successfully", header.getSender(), header.getDeviceId());
   }
 
   @Override
