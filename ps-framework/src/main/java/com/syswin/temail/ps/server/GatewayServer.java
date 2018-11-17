@@ -2,6 +2,7 @@ package com.syswin.temail.ps.server;
 
 import com.syswin.temail.ps.common.Constants;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
+import com.syswin.temail.ps.server.handler.HeartbeatAwarePacketHandler;
 import com.syswin.temail.ps.server.handler.IdleHandler;
 import com.syswin.temail.ps.server.handler.PacketHandler;
 import com.syswin.temail.ps.server.service.HeartBeatService;
@@ -44,7 +45,7 @@ public class GatewayServer {
       int idleTimeSeconds) {
 
     this.idleHandler = new IdleHandler(sessionService, idleTimeSeconds);
-    this.packetHandler = new PacketHandler(sessionService, requestService, new HeartBeatService());
+    this.packetHandler = new HeartbeatAwarePacketHandler(sessionService, requestService, new HeartBeatService());
     this.packetEncoderSupplier = packetEncoderSupplier;
     this.packetDecoderSupplier = packetDecoderSupplier;
     this.port = port;

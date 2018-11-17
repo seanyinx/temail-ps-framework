@@ -5,19 +5,18 @@ import static com.syswin.temail.ps.common.entity.CommandSpaceType.CHANNEL_CODE;
 import static com.syswin.temail.ps.common.entity.CommandType.INTERNAL_ERROR;
 import static com.syswin.temail.ps.common.entity.CommandType.LOGIN;
 import static com.syswin.temail.ps.common.entity.CommandType.LOGOUT;
-import static com.syswin.temail.ps.common.entity.CommandType.PING;
 
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import com.syswin.temail.ps.common.entity.CDTPProtoBuf.CDTPServerError;
 import com.syswin.temail.ps.common.exception.PacketException;
-import com.syswin.temail.ps.server.service.HeartBeatService;
 import com.syswin.temail.ps.server.service.RequestService;
 import com.syswin.temail.ps.server.service.SessionService;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -26,15 +25,12 @@ public class PacketHandler extends SimpleChannelInboundHandler<CDTPPacket> {
 
   private final SessionService sessionService;
   private final RequestService requestService;
-  private final HeartBeatService heartBeatService;
 
   public PacketHandler(
       SessionService sessionService,
-      RequestService requestService,
-      HeartBeatService heartBeatService) {
+      RequestService requestService) {
     this.sessionService = sessionService;
     this.requestService = requestService;
-    this.heartBeatService = heartBeatService;
   }
 
   @Override
@@ -42,11 +38,12 @@ public class PacketHandler extends SimpleChannelInboundHandler<CDTPPacket> {
     try {
       Channel channel = ctx.channel();
       short commandSpace = packet.getCommandSpace();
+      short command = packet.getCommand();
+
+      validateHeader(packet);
+
       if (commandSpace == CHANNEL_CODE) {
-        short command = packet.getCommand();
-        if (command == PING.getCode()) {
-          heartBeatService.pong(channel, packet);
-        } else if (command == LOGIN.getCode()) {
+        if (command == LOGIN.getCode()) {
           sessionService.login(channel, packet);
         } else if (command == LOGOUT.getCode()) {
           sessionService.logout(channel, packet);
@@ -86,6 +83,14 @@ public class PacketHandler extends SimpleChannelInboundHandler<CDTPPacket> {
       }
       packet.setData(builder.build().toByteArray());
       ctx.writeAndFlush(packet, ctx.voidPromise());
+    }
+  }
+
+  private void validateHeader(CDTPPacket packet) {
+    if (packet.getHeader() == null
+        || StringUtil.isNullOrEmpty(packet.getHeader().getDeviceId())
+        || StringUtil.isNullOrEmpty(packet.getHeader().getSender())) {
+      throw new IllegalArgumentException("Sender and device ID must not be empty");
     }
   }
 }
