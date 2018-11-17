@@ -36,6 +36,7 @@ public class GatewayServer {
   private final int idleTimeSeconds;
   private final Supplier<MessageToByteEncoder<CDTPPacket>> packetEncoderSupplier;
   private final Supplier<ByteToMessageDecoder> packetDecoderSupplier;
+  private final boolean enableEpoll;
 
   public GatewayServer(SessionService sessionService,
       RequestService requestService,
@@ -44,26 +45,38 @@ public class GatewayServer {
       int port,
       int idleTimeSeconds) {
 
+    this(sessionService, requestService, packetEncoderSupplier, packetDecoderSupplier, port, idleTimeSeconds, false);
+  }
+
+  public GatewayServer(SessionService sessionService,
+      RequestService requestService,
+      Supplier<MessageToByteEncoder<CDTPPacket>> packetEncoderSupplier,
+      Supplier<ByteToMessageDecoder> packetDecoderSupplier,
+      int port,
+      int idleTimeSeconds,
+      boolean enableEpoll) {
+
     this.idleHandler = new IdleHandler(sessionService, idleTimeSeconds);
     this.packetHandler = new HeartbeatAwarePacketHandler(sessionService, requestService, new HeartBeatService());
     this.packetEncoderSupplier = packetEncoderSupplier;
     this.packetDecoderSupplier = packetDecoderSupplier;
     this.port = port;
     this.idleTimeSeconds = idleTimeSeconds;
+    this.enableEpoll = enableEpoll;
   }
 
   public Stoppable run() {
     EventLoopGroup bossGroup;
     EventLoopGroup workerGroup;// 默认 cpu
 
-    try {
+    if(enableEpoll) {
       bossGroup = new EpollEventLoopGroup(1);
       workerGroup = new EpollEventLoopGroup();
       LOGGER.info("Using epoll event loop group");
-    } catch (Throwable t) {
+    } else {
       bossGroup = new NioEventLoopGroup(1);
       workerGroup = new NioEventLoopGroup();
-      LOGGER.info("Using Nio event loop group, since epoll is only available on linux");
+      LOGGER.info("Using Nio event loop group");
     }
 
     ServerBootstrap bootstrap = new ServerBootstrap();
