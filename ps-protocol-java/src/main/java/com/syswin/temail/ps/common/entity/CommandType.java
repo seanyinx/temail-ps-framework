@@ -31,7 +31,6 @@ public enum CommandType {
   }
 
   public static CommandType valueOf(short code) {
-    CommandType.valueOf("");
     for (CommandType commandType : CommandType.values()) {
       if (commandType.getCode() == code) {
         return commandType;
