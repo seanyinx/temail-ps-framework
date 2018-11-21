@@ -49,12 +49,12 @@ public abstract class AbstractSessionService implements SessionService {
     CDTPHeader header = reqPacket.getHeader();
     loginExtAsync(reqPacket,
         respPacket -> {
-          log.debug("User {} on device {} logged in successfully", header.getSender(), header.getDeviceId());
+          log.debug("User {} on device {} logged in on channel {} successfully", header.getSender(), header.getDeviceId(), channel);
           channelHolder.addSession(header.getSender(), header.getDeviceId(), channel);
           channel.writeAndFlush(respPacket, channel.voidPromise());
         },
         msg -> {
-          log.debug("User {} on device {} logged in failed", header.getSender(), header.getDeviceId());
+          log.debug("User {} on device {} logged in on channel {} failed", header.getSender(), header.getDeviceId(), channel);
           channel.writeAndFlush(msg, channel.voidPromise());
         });
   }
@@ -65,14 +65,16 @@ public abstract class AbstractSessionService implements SessionService {
     String deviceId = reqPacket.getHeader().getDeviceId();
     if (hasSession(channel, temail, deviceId)) {
       // 已经构建会话
+      log.debug("Skip binding because user {} on device {} is already connected on channel {}", temail, deviceId, channel);
       return;
     }
     loginExtAsync(reqPacket,
         respPacket -> {
-          log.debug("User {} on device {} logged in successfully", temail, deviceId);
+          log.debug("User {} on device {} bound to channel {} successfully", temail, deviceId, channel);
           channelHolder.addSession(temail, deviceId, channel);
         },
         respPacket -> {
+          log.debug("User {} on device {} bound to channel {} failed", temail, deviceId, channel);
           // 自动绑定操作，登录失败不需要处理
         });
   }
@@ -84,12 +86,13 @@ public abstract class AbstractSessionService implements SessionService {
     logoutExt(packet, respPacket);
     channel.writeAndFlush(respPacket, channel.voidPromise());
     channelHolder.removeSession(header.getSender(), header.getDeviceId(), channel);
-    log.debug("User {} on device {} logged out successfully", header.getSender(), header.getDeviceId());
+    log.debug("User {} on device {} logged out on channel {} successfully", header.getSender(), header.getDeviceId(), channel);
   }
 
   @Override
   public final void disconnect(Channel channel) {
     Collection<Session> sessions = channelHolder.removeChannel(channel);
+    log.debug("Removed sessions {} on closing channel {}", channel);
     disconnectExt(sessions);
   }
 

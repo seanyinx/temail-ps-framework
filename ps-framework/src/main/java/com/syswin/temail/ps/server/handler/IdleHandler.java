@@ -31,7 +31,7 @@ public class IdleHandler extends SimpleUserEventChannelHandler<IdleStateEvent> {
       log.debug("Closed inactive channel {} after {} seconds", ctx.channel(), idleTimeSeconds);
       Channel channel = ctx.channel();
       sessionService.disconnect(channel);
-      channel.close();
+      channel.close(channel.voidPromise());
     }
   }
 
@@ -39,7 +39,7 @@ public class IdleHandler extends SimpleUserEventChannelHandler<IdleStateEvent> {
   public void channelInactive(ChannelHandlerContext ctx) {
     log.debug("Client closed channel {}", ctx.channel());
     sessionService.disconnect(ctx.channel());
-    ctx.channel().close();
+    ctx.channel().close(ctx.channel().voidPromise());
   }
 
 }
