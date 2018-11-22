@@ -1,16 +1,18 @@
 package com.syswin.temail.ps.server.service;
 
 import static com.syswin.temail.ps.server.utils.SignatureUtil.resetSignature;
-
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import com.syswin.temail.ps.common.entity.CDTPProtoBuf.CDTPLoginResp;
 import com.syswin.temail.ps.common.entity.CDTPProtoBuf.CDTPLogoutResp;
 import com.syswin.temail.ps.server.Constants;
 import com.syswin.temail.ps.server.entity.Session;
+import com.syswin.temail.ps.server.service.channels.strategy.ChannelManager;
+import com.syswin.temail.ps.server.service.channels.strategy.one2one.ChannelManagerOne2One;
 import io.netty.channel.Channel;
 import java.util.Collection;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,16 +24,16 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class AbstractSessionService implements SessionService {
 
   @Getter
-  private final ChannelHolder channelHolder = new ChannelHolder();
+  private final ChannelManager channelHolder = new ChannelManagerOne2One();
 
-  protected void loginExtAsync(CDTPPacket reqPacket, Consumer<CDTPPacket> successHandler,
+  protected void loginExtAsync(CDTPPacket reqPacket, Function<CDTPPacket,Collection<Session>> successHandler,
       Consumer<CDTPPacket> failedHandler) {
     CDTPPacket respPacket = new CDTPPacket(reqPacket);
     CDTPLoginResp.Builder builder = CDTPLoginResp.newBuilder();
     builder.setCode(Constants.HTTP_STATUS_OK);
     respPacket.setData(builder.build().toByteArray());
     resetSignature(respPacket);
-    successHandler.accept(respPacket);
+    successHandler.apply(respPacket);
   }
 
   protected void logoutExt(CDTPPacket packet, CDTPPacket respPacket) {
@@ -50,8 +52,9 @@ public abstract class AbstractSessionService implements SessionService {
     loginExtAsync(reqPacket,
         respPacket -> {
           log.debug("User {} on device {} logged in on channel {} successfully", header.getSender(), header.getDeviceId(), channel);
-          channelHolder.addSession(header.getSender(), header.getDeviceId(), channel);
+          Collection<Session> sessions = channelHolder.addSession(header.getSender(), header.getDeviceId(), channel);
           channel.writeAndFlush(respPacket, channel.voidPromise());
+          return sessions;
         },
         msg -> {
           log.debug("User {} on device {} logged in on channel {} failed", header.getSender(), header.getDeviceId(), channel);
@@ -71,7 +74,7 @@ public abstract class AbstractSessionService implements SessionService {
     loginExtAsync(reqPacket,
         respPacket -> {
           log.debug("User {} on device {} bound to channel {} successfully", temail, deviceId, channel);
-          channelHolder.addSession(temail, deviceId, channel);
+          return channelHolder.addSession(temail, deviceId, channel);
         },
         respPacket -> {
           log.debug("User {} on device {} bound to channel {} failed", temail, deviceId, channel);

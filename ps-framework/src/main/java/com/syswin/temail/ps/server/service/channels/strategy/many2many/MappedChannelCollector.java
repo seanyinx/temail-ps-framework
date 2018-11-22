@@ -1,6 +1,7 @@
-package com.syswin.temail.ps.server.service;
+package com.syswin.temail.ps.server.service.channels.strategy.many2many;
 
 import com.syswin.temail.ps.server.entity.Session;
+import com.syswin.temail.ps.server.service.channels.strategy.ChannelManager;
 import io.netty.channel.Channel;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,7 +11,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-class MappedChannelCollector implements ChannelCollector {
+class MappedChannelCollector implements ChannelManager {
 
   private final Map<Channel, Collection<Session>> channelSessionMap = new ConcurrentHashMap<>();
 
@@ -21,9 +22,10 @@ class MappedChannelCollector implements ChannelCollector {
   }
 
   @Override
-  public void addSession(String temail, String deviceId, Channel channel) {
+  public Collection<Session> addSession(String temail, String deviceId, Channel channel) {
     Collection<Session> sessions = channelSessionMap.computeIfAbsent(channel, s -> new ConcurrentLinkedQueue<>());
     sessions.add(new Session(temail, deviceId));
+    return Collections.emptyList();
   }
 
   @Override
@@ -40,4 +42,13 @@ class MappedChannelCollector implements ChannelCollector {
     Collection<Session> sessions = channelSessionMap.remove(channel);
     return sessions == null ? Collections.emptyList() : sessions;
   }
+
+  public Channel getChannel(String temail, String deviceId) {
+    throw new UnsupportedOperationException();
+  }
+
+  public Iterable<Channel> getChannels(String temail) {
+    throw new UnsupportedOperationException();
+  }
+
 }

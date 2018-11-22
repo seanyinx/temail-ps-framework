@@ -1,16 +1,17 @@
-package com.syswin.temail.ps.server.service;
+package com.syswin.temail.ps.server.service.channels.strategy.many2many;
 
 import com.syswin.temail.ps.server.entity.Session;
+import com.syswin.temail.ps.server.service.channels.strategy.ChannelManager;
 import io.netty.channel.Channel;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ChannelHolder implements ChannelCollector {
+public class ChannelHolder implements ChannelManager {
 
   private final Map<String, Map<String, Channel>> sessionChannelMap = new ConcurrentHashMap<>();
-  private final ChannelCollector channelCollector = new MappedChannelCollector();
+  private final ChannelManager channelCollector = new MappedChannelCollector();
 
   public Channel getChannel(String temail, String deviceId) {
     return sessionChannelMap.getOrDefault(temail, Collections.emptyMap()).get(deviceId);
@@ -26,16 +27,16 @@ public class ChannelHolder implements ChannelCollector {
   }
 
   @Override
-  public void addSession(String temail, String deviceId, Channel channel) {
+  public Collection<Session> addSession(String temail, String deviceId, Channel channel) {
     Map<String, Channel> deviceChannelMap = sessionChannelMap.computeIfAbsent(temail, s -> new ConcurrentHashMap<>());
     Channel oldChannel = deviceChannelMap.put(deviceId, channel);
     if (!channel.equals(oldChannel)) {
       if (oldChannel != null) {
         channelCollector.removeSession(temail, deviceId, oldChannel);
       }
-
       channelCollector.addSession(temail, deviceId, channel);
     }
+    return Collections.emptyList();
   }
 
   @Override
