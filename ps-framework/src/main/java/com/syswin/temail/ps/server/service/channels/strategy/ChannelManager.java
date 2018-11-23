@@ -10,7 +10,7 @@ public interface ChannelManager {
 
   Collection<Session> addSession(String temail, String deviceId, Channel channel);
 
-  void removeSession(String temail, String deviceId, Channel channel);
+  Collection<Session> removeSession(String temail, String deviceId, Channel channel);
 
   Collection<Session> removeChannel(Channel channel);
 

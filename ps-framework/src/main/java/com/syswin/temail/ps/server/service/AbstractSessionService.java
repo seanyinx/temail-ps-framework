@@ -13,6 +13,7 @@ import io.netty.channel.Channel;
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +37,7 @@ public abstract class AbstractSessionService implements SessionService {
     successHandler.apply(respPacket);
   }
 
-  protected void logoutExt(CDTPPacket packet, CDTPPacket respPacket) {
+  protected void logoutExt(CDTPPacket packet, CDTPPacket respPacket, Supplier<Collection<Session>> rmedSessionsSupplier) {
     CDTPLogoutResp.Builder builder = CDTPLogoutResp.newBuilder();
     builder.setCode(Constants.HTTP_STATUS_OK);
     respPacket.setData(builder.build().toByteArray());
@@ -85,10 +86,10 @@ public abstract class AbstractSessionService implements SessionService {
   @Override
   public final void logout(Channel channel, CDTPPacket packet) {
     CDTPHeader header = packet.getHeader();
+    Collection<Session> sessions = channelHolder.removeSession(header.getSender(), header.getDeviceId(), channel);
     CDTPPacket respPacket = new CDTPPacket(packet);
-    logoutExt(packet, respPacket);
+    logoutExt(packet, respPacket, () -> sessions);
     channel.writeAndFlush(respPacket, channel.voidPromise());
-    channelHolder.removeSession(header.getSender(), header.getDeviceId(), channel);
     log.debug("User {} on device {} logged out on channel {} successfully", header.getSender(), header.getDeviceId(), channel);
   }
 
