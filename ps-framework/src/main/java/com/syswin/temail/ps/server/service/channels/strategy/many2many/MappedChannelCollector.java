@@ -29,12 +29,13 @@ class MappedChannelCollector implements ChannelManager {
   }
 
   @Override
-  public void removeSession(String temail, String deviceId, Channel channel) {
+  public Collection<Session> removeSession(String temail, String deviceId, Channel channel) {
     Collection<Session> sessions = channelSessionMap.getOrDefault(channel, Collections.emptyList());
     sessions.removeIf(session -> temail.equals(session.getTemail()) && deviceId.equals(session.getDeviceId()));
     if (sessions.isEmpty()) {
       channelSessionMap.remove(channel);
     }
+    return sessions;
   }
 
   @Override

@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-
 import com.syswin.temail.ps.server.entity.Session;
+import com.syswin.temail.ps.server.service.channels.strategy.many2many.ChannelHolder;
 import io.netty.channel.Channel;
 import java.util.Iterator;
 import java.util.concurrent.BrokenBarrierException;

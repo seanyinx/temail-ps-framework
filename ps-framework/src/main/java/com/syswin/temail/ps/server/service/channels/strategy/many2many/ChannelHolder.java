@@ -40,7 +40,7 @@ public class ChannelHolder implements ChannelManager {
   }
 
   @Override
-  public void removeSession(String temail, String deviceId, Channel channel) {
+  public Collection<Session> removeSession(String temail, String deviceId, Channel channel) {
     Map<String, Channel> deviceChannelMap = sessionChannelMap.get(temail);
     if (deviceChannelMap != null) {
       // 先移除sessionChannel
@@ -49,6 +49,7 @@ public class ChannelHolder implements ChannelManager {
       // 再移除channelSession
       channelCollector.removeSession(temail, deviceId, channel);
     }
+    return Collections.emptyList();
   }
 
   @Override

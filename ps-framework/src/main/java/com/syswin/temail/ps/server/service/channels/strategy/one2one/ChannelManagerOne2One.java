@@ -59,14 +59,7 @@ public class ChannelManagerOne2One implements ChannelManager {
 
       log.debug("从现有的 temail -> deviceId -> channel 映射关系 : {} 中移除因为新channel建立导致失效的就session : {}",
           temail2Channel.toString(), rmedSessions.toString());
-      for (Session session : rmedSessions) {
-        Optional.ofNullable(temail2Channel.get(session.getTemail())).ifPresent(t -> t.remove(session.getDeviceId()));
-        Optional.ofNullable(temail2Channel.get(session.getTemail())).ifPresent(t -> {
-          if (t.isEmpty()) {
-            temail2Channel.remove(temail);
-          }
-        });
-      }
+      cleanTemail2ChannelRelas(rmedSessions);
       log.debug("移除失效session后 temail -> deviceId -> channel 的映射关系为：{}", temail2Channel.toString());
 
       Map<String, Channel> orDefault = temail2Channel.computeIfAbsent(temail, t -> new ConcurrentHashMap<>());
@@ -99,10 +92,11 @@ public class ChannelManagerOne2One implements ChannelManager {
     log.debug("从 temila -> deviceId -> channel 映射{} 中移除 temail:{} deviceId:{} channel:{} 的绑定关系", temail2Channel, temail,
         deviceId, channel);
     Optional.ofNullable(temail2Channel.get(temail)).ifPresent(t -> t.remove(deviceId));
-       log.debug("从 temila -> deviceId -> channel 映射{} 中移除 temail:{} deviceId:{} channel:{} 操作后的绑定关系", temail2Channel, temail,
+    log.debug("从 temila -> deviceId -> channel 映射{} 中移除 temail:{} deviceId:{} channel:{} 操作后的绑定关系", temail2Channel,
+        temail,
         deviceId, channel);
 
-    return Collections.singletonList(new Session(temail,deviceId));
+    return Collections.singletonList(new Session(temail, deviceId));
   }
 
   @Override
@@ -113,21 +107,34 @@ public class ChannelManagerOne2One implements ChannelManager {
     log.debug("需要被移除的channel:{} 对应的设备号为 deviceId :{}", channel, devId);
 
     ChannelSessionsBinder rmedBinder = devIdBinderMap.remove(devId);
-    log.debug("设备号 deviceId : {} 对应的ChannelSessionsBinder为：{}",devId, rmedBinder);
+    log.debug("设备号 deviceId : {} 对应的ChannelSessionsBinder为：{}", devId, rmedBinder);
 
     Collection<Session> sessions = rmedBinder != null ? rmedBinder.getSessions() : emptyList();
     log.info("因为channel:{} 被移除导致需要从channel-server移除的session集合为：{}", sessions.toString());
 
+    cleanTemail2ChannelRelas(sessions);
     return sessions;
+  }
+
+  private void cleanTemail2ChannelRelas(Collection<Session> rmedSessions) {
+    for (Session session : rmedSessions) {
+      Optional.ofNullable(temail2Channel.get(session.getTemail())).ifPresent(t -> t.remove(session.getDeviceId()));
+      Optional.ofNullable(temail2Channel.get(session.getTemail())).ifPresent(t -> {
+        if (t.isEmpty()) {
+          temail2Channel.remove(session.getTemail());
+        }
+      });
+    }
   }
 
   public Channel getChannel(String temail, String deviceId) {
     Map map = temail2Channel.get(temail);
-    return map.get(deviceId) == null ? null : (Channel) map.get(deviceId);
+    return map == null ? null : (Channel) map.get(deviceId);
   }
 
   public Iterable<Channel> getChannels(String temail) {
     Map map = temail2Channel.get(temail);
     return map == null ? emptyList() : map.values();
   }
+
 }
