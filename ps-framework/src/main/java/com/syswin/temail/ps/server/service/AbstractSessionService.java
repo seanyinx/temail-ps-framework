@@ -26,7 +26,7 @@ public abstract class AbstractSessionService implements SessionService {
   @Getter
   private final ChannelManager channelHolder = new ChannelManagerOne2One();
 
-  protected void loginExtAsync(CDTPPacket reqPacket, Function<CDTPPacket,Collection<Session>> successHandler,
+  protected void loginExtAsync(CDTPPacket reqPacket, Function<CDTPPacket, Collection<Session>> successHandler,
       Consumer<CDTPPacket> failedHandler) {
     CDTPPacket respPacket = new CDTPPacket(reqPacket);
     CDTPLoginResp.Builder builder = CDTPLoginResp.newBuilder();
@@ -101,7 +101,7 @@ public abstract class AbstractSessionService implements SessionService {
 
   private boolean hasSession(Channel channel, String temail, String deviceId) {
     return isNotEmpty(temail) && isNotEmpty(deviceId)
-        && channel == channelHolder.getChannel(temail, deviceId);
+        && channelHolder.hasSession(temail, deviceId, channel);
   }
 
   private boolean isNotEmpty(String str) {

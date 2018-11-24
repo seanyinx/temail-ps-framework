@@ -6,16 +6,14 @@ import java.util.Collection;
 
 public interface ChannelManager {
 
-  boolean hasNoSession(Channel channel);
-
   Collection<Session> addSession(String temail, String deviceId, Channel channel);
 
-  Collection<Session> removeSession(String temail, String deviceId, Channel channel);
+  void removeSession(String temail, String deviceId, Channel channel);
 
   Collection<Session> removeChannel(Channel channel);
 
-  public Channel getChannel(String temail, String deviceId) ;
+  boolean hasSession(String temail, String deviceId, Channel channel) ;
 
-  public Iterable<Channel> getChannels(String temail) ;
+  Iterable<Channel> getChannels(String temail) ;
 
 }

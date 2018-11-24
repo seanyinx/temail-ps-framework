@@ -17,8 +17,9 @@ public class ChannelSessionsBinder {
     this.channel = channel;
   }
 
-  public void addSession(Session session){
-    this.sessions.add(session);
+  Session addSession(String temail, String deviceId) {
+    Session session = new Session(temail, deviceId);
+    sessions.add(session);
+    return session;
   }
-
 }
