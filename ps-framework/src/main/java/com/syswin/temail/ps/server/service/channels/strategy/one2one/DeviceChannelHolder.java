@@ -29,10 +29,10 @@ class DeviceChannelHolder {
         .computeIfAbsent(deviceId, t -> new ChannelSessionsBinder(channel));
 
     if (channel.equals(currentBinder.getChannel())) {
-      log.info("准备向已经已经建立的channel ：{}  添加session, deviceId : {}  temail : {}", channel, deviceId, temail);
       Session session = currentBinder.addSession(temail, deviceId);
       channelDevIdMap.put(channel, deviceId);
       existingChannelHandler.accept(channel, session);
+      log.debug("Added temail {} device {} channel {} mapping", temail, deviceId, channel);
       return Collections.emptyList();
     }
 
@@ -44,6 +44,11 @@ class DeviceChannelHolder {
 
     // close before cleaning up temail:channel mapping to avoid temail binding on old channel again on request
     oldChannel.close(oldChannel.voidPromise());
+    log.info("Closed and replaced channel {} with {} in temail {} device {} mapping due to new connection from this device",
+        oldChannel,
+        channel,
+        temail,
+        deviceId);
 
     Collection<Session> sessionsExpired = currentBinder.getSessions();
     replacedChannelHandler.accept(channel, sessionsExpired);
@@ -53,7 +58,6 @@ class DeviceChannelHolder {
   }
 
   private Session bindToNewChannel(String temail, String deviceId, Channel channel) {
-    log.info("准备向新建立的channel ：{}  添加session, deviceId : {}  temail : {}", channel.id(), deviceId, temail);
     ChannelSessionsBinder binder = new ChannelSessionsBinder(channel);
     Session session = binder.addSession(temail, deviceId);
     devIdBinderMap.put(deviceId, binder);

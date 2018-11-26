@@ -84,6 +84,7 @@ public class ChannelManagerOne2OneTest {
     boolean channel = manager.hasSession(temail2, device1, channel2);
     assertThat(channel).isEqualTo(true);
 
+    assertThat(manager.hasSession(temail1, device1, channel1)).isFalse();
     assertThat(manager.hasSession(temail1, device1, channel2)).isFalse();
     verify(channel1).close(promise);
     verify(channel2, never()).close(any());
