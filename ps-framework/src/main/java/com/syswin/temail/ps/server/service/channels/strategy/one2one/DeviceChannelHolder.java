@@ -51,9 +51,9 @@ class DeviceChannelHolder {
         deviceId);
 
     Collection<Session> sessionsExpired = currentBinder.getSessions();
+    sessionsExpired.removeIf(session -> isSameSession(temail, deviceId, session));
     replacedChannelHandler.accept(channel, sessionsExpired);
 
-    sessionsExpired.removeIf(session -> isSameSession(temail, deviceId, session));
     return sessionsExpired;
   }
 
