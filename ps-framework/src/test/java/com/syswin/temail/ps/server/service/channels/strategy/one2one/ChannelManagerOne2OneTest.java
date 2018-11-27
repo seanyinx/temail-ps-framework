@@ -1,22 +1,17 @@
 package com.syswin.temail.ps.server.service.channels.strategy.one2one;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.syswin.temail.ps.server.entity.Session;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelPromise;
 import java.util.Collection;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 public class ChannelManagerOne2OneTest {
 
-  private final ChannelPromise promise = Mockito.mock(ChannelPromise.class);
   private final Channel channel1 = Mockito.mock(Channel.class, "channel1");
   private final Channel channel2 = Mockito.mock(Channel.class, "channel2");
 
@@ -27,12 +22,6 @@ public class ChannelManagerOne2OneTest {
   private final String device2 = "device2";
   private final String temail3 = "c@email.com";
 
-  @Before
-  public void setUp() {
-    when(channel1.voidPromise()).thenReturn(promise);
-    when(channel2.voidPromise()).thenReturn(promise);
-  }
-
   @Test
   public void addSession() {
     Collection<Session> sessionsToDelete = manager.addSession(temail1, device1, channel1);
@@ -41,7 +30,7 @@ public class ChannelManagerOne2OneTest {
     boolean channel = manager.hasSession(temail1, device1, channel1);
     assertThat(channel).isEqualTo(true);
     assertThat(manager.getChannels(temail1)).containsOnly(channel1);
-    verify(channel1, never()).close(any());
+    verify(channel1, never()).close();
   }
 
   @Test
@@ -53,8 +42,8 @@ public class ChannelManagerOne2OneTest {
     assertThat(sessionsToDelete).isEmpty();
 
     assertThat(manager.getChannels(temail1)).containsOnly(channel1, channel2);
-    verify(channel1, never()).close(any());
-    verify(channel2, never()).close(any());
+    verify(channel1, never()).close();
+    verify(channel2, never()).close();
   }
 
   @Test
@@ -66,8 +55,8 @@ public class ChannelManagerOne2OneTest {
 
     boolean channel = manager.hasSession(temail1, device1, channel2);
     assertThat(channel).isEqualTo(true);
-    verify(channel1).close(promise);
-    verify(channel2, never()).close(any());
+    verify(channel1).close();
+    verify(channel2, never()).close();
   }
 
   @Test
@@ -86,8 +75,8 @@ public class ChannelManagerOne2OneTest {
 
     assertThat(manager.hasSession(temail1, device1, channel1)).isFalse();
     assertThat(manager.hasSession(temail1, device1, channel2)).isFalse();
-    verify(channel1).close(promise);
-    verify(channel2, never()).close(any());
+    verify(channel1).close();
+    verify(channel2, never()).close();
   }
 
   @Test
@@ -107,8 +96,8 @@ public class ChannelManagerOne2OneTest {
     assertThat(manager.hasSession(temail1, device1, channel2)).isTrue();
     assertThat(manager.hasSession(temail2, device1, channel2)).isFalse();
     assertThat(manager.hasSession(temail3, device1, channel2)).isFalse();
-    verify(channel1).close(promise);
-    verify(channel2, never()).close(any());
+    verify(channel1).close();
+    verify(channel2, never()).close();
   }
 
   @Test
@@ -118,7 +107,7 @@ public class ChannelManagerOne2OneTest {
 
     assertThat(manager.hasSession(temail1, device1, channel1)).isFalse();
     assertThat(manager.getChannels(temail1)).isEmpty();
-    verify(channel1, never()).close(any());
+    verify(channel1, never()).close();
   }
 
   @Test
@@ -132,6 +121,25 @@ public class ChannelManagerOne2OneTest {
 
     assertThat(manager.hasSession(temail1, device1, channel1)).isFalse();
     assertThat(manager.hasSession(temail2, device1, channel1)).isFalse();
-    verify(channel1, never()).close(any());
+    verify(channel1, never()).close();
+  }
+
+  @Test
+  public void emptySessionIfRemovingInactiveChannel() {
+    manager.addSession(temail1, device1, channel1);
+    manager.addSession(temail2, device1, channel1);
+
+    manager.removeSession(temail1, device1, channel1);
+    manager.removeSession(temail2, device1, channel1);
+
+    Collection<Session> sessionsToDelete = manager.removeChannel(channel1);
+    assertThat(sessionsToDelete).isEmpty();
+    verify(channel1, never()).close();
+  }
+
+  @Test
+  public void noSuchSession() {
+    assertThat(manager.hasSession(temail1, device1, channel1)).isFalse();
+    assertThat(manager.getChannels(temail1)).isEmpty();
   }
 }

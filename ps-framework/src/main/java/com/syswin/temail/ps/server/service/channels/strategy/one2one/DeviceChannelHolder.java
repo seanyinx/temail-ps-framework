@@ -43,7 +43,7 @@ class DeviceChannelHolder {
     channelDevIdMap.put(channel, deviceId);
 
     // close before cleaning up temail:channel mapping to avoid temail binding on old channel again on request
-    oldChannel.close(oldChannel.voidPromise());
+    oldChannel.close();
     log.info("Closed and replaced channel {} with {} in temail {} device {} mapping due to new connection from this device",
         oldChannel,
         channel,
