@@ -62,7 +62,7 @@ public class PacketHandler extends SimpleChannelInboundHandler<CDTPPacket> {
 
   @Override
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-    log.error("netty server exception on handling packet, channel:{} " + ctx.channel(), cause);
+    log.error("Failed to handle packet on channel: {}", ctx.channel(), cause);
     if (ctx.channel().isActive()) {
       CDTPPacket packet;
       if (cause instanceof PacketException && ((PacketException) cause).getPacket() != null) {
