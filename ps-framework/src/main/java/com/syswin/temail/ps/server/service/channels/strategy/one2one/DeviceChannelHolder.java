@@ -74,6 +74,9 @@ class DeviceChannelHolder {
 
   Collection<Session> removeChannel(Channel channel) {
     String devId = channelDevIdMap.remove(channel);
+    if (devId == null) {
+      return emptyList();
+    }
     ChannelSessionsBinder binder = devIdBinderMap.remove(devId);
 
     return binder != null ? binder.getSessions() : emptyList();

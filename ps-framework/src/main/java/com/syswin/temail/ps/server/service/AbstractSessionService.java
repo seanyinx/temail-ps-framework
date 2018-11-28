@@ -95,7 +95,7 @@ public abstract class AbstractSessionService implements SessionService {
   @Override
   public final void disconnect(Channel channel) {
     Collection<Session> sessions = channelHolder.removeChannel(channel);
-    log.debug("Removed sessions {} on closing channel {}", channel);
+    log.debug("Removed sessions {} on closing channel {}", sessions.toString(), channel);
     disconnectExt(sessions);
   }
 
