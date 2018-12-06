@@ -1,7 +1,5 @@
 package com.syswin.temail.ps.server.service.channels.strategy.one2one;
 
-import static java.util.Collections.emptyMap;
-
 import com.syswin.temail.ps.server.entity.Session;
 import com.syswin.temail.ps.server.service.channels.strategy.ChannelManager;
 import io.netty.channel.Channel;
@@ -9,7 +7,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+
+import static java.util.Collections.emptyMap;
 
 @Slf4j
 public class ChannelManagerOne2One implements ChannelManager {
@@ -20,7 +21,8 @@ public class ChannelManagerOne2One implements ChannelManager {
 
   public ChannelManagerOne2One() {
     existingChannelHandler = (channel, session) -> {
-      Map<String, Channel> temailDevIdChannels = temail2Channel.computeIfAbsent(session.getTemail(), t -> new ConcurrentHashMap<>());
+      Map<String, Channel> temailDevIdChannels = temail2Channel
+          .computeIfAbsent(session.getTemail(), t -> new ConcurrentHashMap<>());
       temailDevIdChannels.put(session.getDeviceId(), channel);
     };
   }
@@ -29,7 +31,8 @@ public class ChannelManagerOne2One implements ChannelManager {
   public Collection<Session> addSession(String temail, String deviceId, Channel channel) {
     return deviceChannelHolder.addSession(temail, deviceId, channel,
         existingChannelHandler,
-        (newChannel, expiredSessions) -> replaceExistingChannelFromTheSameDevice(temail, deviceId, newChannel, expiredSessions));
+        (newChannel, expiredSessions) -> replaceExistingChannelFromTheSameDevice(temail, deviceId, newChannel,
+            expiredSessions));
   }
 
   private void replaceExistingChannelFromTheSameDevice(String temail,
@@ -77,4 +80,14 @@ public class ChannelManagerOne2One implements ChannelManager {
   public Iterable<Channel> getChannels(String temail) {
     return temail2Channel.getOrDefault(temail, emptyMap()).values();
   }
+
+  public Iterable<Channel> getChannelsExceptSender(String temail, String senderDeviceId) {
+    return temail2Channel.getOrDefault(temail, emptyMap()).entrySet().stream().filter(en -> {
+      return !senderDeviceId.equals(en.getKey());
+    }).map(en -> {
+      return en.getValue();
+    }).collect(
+        Collectors.toList());
+  }
+
 }

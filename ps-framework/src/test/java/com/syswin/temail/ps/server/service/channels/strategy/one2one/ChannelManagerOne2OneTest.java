@@ -1,19 +1,20 @@
 package com.syswin.temail.ps.server.service.channels.strategy.one2one;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-
 import com.syswin.temail.ps.server.entity.Session;
 import io.netty.channel.Channel;
 import java.util.Collection;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
 public class ChannelManagerOne2OneTest {
 
   private final Channel channel1 = Mockito.mock(Channel.class, "channel1");
   private final Channel channel2 = Mockito.mock(Channel.class, "channel2");
+  private final Channel channel3 = Mockito.mock(Channel.class, "channel3");
 
   private final ChannelManagerOne2One manager = new ChannelManagerOne2One();
   private final String temail1 = "a@email.com";
@@ -21,6 +22,7 @@ public class ChannelManagerOne2OneTest {
   private final String temail2 = "b@email.com";
   private final String device2 = "device2";
   private final String temail3 = "c@email.com";
+  private final String device3 = "device3";
 
   @Test
   public void addSession() {
@@ -142,4 +144,15 @@ public class ChannelManagerOne2OneTest {
     assertThat(manager.hasSession(temail1, device1, channel1)).isFalse();
     assertThat(manager.getChannels(temail1)).isEmpty();
   }
+
+  @Test
+  public void exceptChannelByDesignedDeviceId(){
+    manager.addSession(temail1,device1,channel1);
+    manager.addSession(temail1,device2,channel2);
+    manager.addSession(temail1,device3,channel3);
+    Iterable<Channel> channels = manager.getChannelsExceptSender(temail1, device2);
+    assertThat(channels).doesNotContain(channel2);
+    assertThat(channels).containsOnly(channel1, channel3);
+  }
+
 }
