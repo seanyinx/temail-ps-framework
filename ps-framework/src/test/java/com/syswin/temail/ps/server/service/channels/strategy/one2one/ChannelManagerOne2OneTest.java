@@ -1,14 +1,13 @@
 package com.syswin.temail.ps.server.service.channels.strategy.one2one;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import com.syswin.temail.ps.server.entity.Session;
 import io.netty.channel.Channel;
 import java.util.Collection;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 public class ChannelManagerOne2OneTest {
 
@@ -150,7 +149,7 @@ public class ChannelManagerOne2OneTest {
     manager.addSession(temail1,device1,channel1);
     manager.addSession(temail1,device2,channel2);
     manager.addSession(temail1,device3,channel3);
-    Iterable<Channel> channels = manager.getChannelsExceptSender(temail1, device2);
+    Iterable<Channel> channels = manager.getChannelsExceptSenderN(temail1, temail1, device2);
     assertThat(channels).doesNotContain(channel2);
     assertThat(channels).containsOnly(channel1, channel3);
   }

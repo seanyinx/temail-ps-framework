@@ -80,7 +80,7 @@ public class ChannelManagerOne2One implements ChannelManager {
     return temail2Channel.getOrDefault(temail, emptyMap()).values();
   }
 
-  public Iterable<Channel> getChannelsExceptSender(String receiver, String sender, String senderDeviceId) {
+  public Iterable<Channel> getChannelsExceptSenderN(String receiver, String sender, String senderDeviceId) {
     return temail2Channel.getOrDefault(receiver, emptyMap()).entrySet().stream().filter(en -> {
       return
           //false - 不要的 ： sender == recevier 并且 设备id一致！

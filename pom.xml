@@ -4,7 +4,7 @@
 
   <groupId>com.syswin.temail</groupId>
   <artifactId>temail-ps-framework</artifactId>
-  <version>1.2.10-SNAPSHOT</version>
+  <version>1.2.11-SNAPSHOT</version>
   <modules>
     <module>ps-protocol</module>
     <module>ps-protocol-java</module>
@@ -31,12 +31,12 @@
       <dependency>
         <groupId>com.syswin.temail</groupId>
         <artifactId>ps-protocol</artifactId>
-        <version>1.2.10-SNAPSHOT</version>
+        <version>1.2.11-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>com.syswin.temail</groupId>
         <artifactId>ps-protocol-java</artifactId>
-        <version>1.2.10-SNAPSHOT</version>
+        <version>1.2.11-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>io.netty</groupId>
