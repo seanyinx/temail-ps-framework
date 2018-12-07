@@ -1,5 +1,6 @@
 package com.syswin.temail.ps.server.service.channels.strategy.one2one;
 
+import static java.util.Collections.emptyMap;
 import com.syswin.temail.ps.server.entity.Session;
 import com.syswin.temail.ps.server.service.channels.strategy.ChannelManager;
 import io.netty.channel.Channel;
@@ -9,8 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-
-import static java.util.Collections.emptyMap;
 
 @Slf4j
 public class ChannelManagerOne2One implements ChannelManager {
@@ -81,9 +80,11 @@ public class ChannelManagerOne2One implements ChannelManager {
     return temail2Channel.getOrDefault(temail, emptyMap()).values();
   }
 
-  public Iterable<Channel> getChannelsExceptSender(String temail, String senderDeviceId) {
-    return temail2Channel.getOrDefault(temail, emptyMap()).entrySet().stream().filter(en -> {
-      return !senderDeviceId.equals(en.getKey());
+  public Iterable<Channel> getChannelsExceptSender(String receiver, String sender, String senderDeviceId) {
+    return temail2Channel.getOrDefault(receiver, emptyMap()).entrySet().stream().filter(en -> {
+      return
+          //false - 不要的 ： sender == recevier 并且 设备id一致！
+          !((senderDeviceId.equals(en.getKey())) && (receiver.equals(sender)));
     }).map(en -> {
       return en.getValue();
     }).collect(

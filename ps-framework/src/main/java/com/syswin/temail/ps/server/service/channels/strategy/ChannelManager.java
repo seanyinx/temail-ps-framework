@@ -16,6 +16,6 @@ public interface ChannelManager {
 
   Iterable<Channel> getChannels(String temail) ;
 
-  Iterable<Channel> getChannelsExceptSender(String temail, String senderDeviceId) ;
+  Iterable<Channel> getChannelsExceptSender(String receiver, String sender, String senderDeviceId) ;
 
 }
