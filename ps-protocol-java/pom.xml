@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.syswin.temail</groupId>
     <artifactId>temail-ps-framework</artifactId>
-    <version>1.2.9-SNAPSHOT</version>
+    <version>1.2.9</version>
   </parent>
   <artifactId>ps-protocol-java</artifactId>
 
