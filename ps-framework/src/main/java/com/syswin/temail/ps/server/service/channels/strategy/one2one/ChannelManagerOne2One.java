@@ -5,6 +5,7 @@ import com.syswin.temail.ps.server.entity.Session;
 import com.syswin.temail.ps.server.service.channels.strategy.ChannelManager;
 import io.netty.channel.Channel;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
@@ -81,7 +82,8 @@ public class ChannelManagerOne2One implements ChannelManager {
   }
 
   public Iterable<Channel> getChannelsExceptSenderN(String receiver, String sender, String senderDeviceId) {
-    return temail2Channel.getOrDefault(receiver, emptyMap()).entrySet().stream().filter(en -> {
+    Map<String, Channel> deviceId2Channel = temail2Channel.getOrDefault(receiver, emptyMap());
+    List<Channel> result = deviceId2Channel.entrySet().stream().filter(en -> {
       return
           //false - 不要的 ： sender == recevier 并且 设备id一致！
           !((senderDeviceId.equals(en.getKey())) && (receiver.equals(sender)));
@@ -89,6 +91,19 @@ public class ChannelManagerOne2One implements ChannelManager {
       return en.getValue();
     }).collect(
         Collectors.toList());
+    log.debug("Receiver: {} , deviceId2Channel: {} , after filetered by sender:{}, senderDeviceId:{} is : {}",
+        receiver, sampleStr(deviceId2Channel), sender, senderDeviceId, sampleStr(result));
+
+    return result;
+  }
+
+  private Object sampleStr(List<Channel> result) {
+    return result.stream().map(channel -> channel.id().toString()).collect(Collectors.toList()).toString();
+  }
+
+  private String sampleStr(Map<String, Channel> deviceId2Channel) {
+    return deviceId2Channel.entrySet().stream().map(en -> en.getKey() + ":" + en.getValue().id().toString())
+        .collect(Collectors.toList()).toString();
   }
 
 }

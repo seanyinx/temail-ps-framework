@@ -5,7 +5,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import com.syswin.temail.ps.server.entity.Session;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelId;
 import java.util.Collection;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -15,6 +17,11 @@ public class ChannelManagerOne2OneTest {
   private final Channel channel2 = Mockito.mock(Channel.class, "channel2");
   private final Channel channel3 = Mockito.mock(Channel.class, "channel3");
 
+  private final ChannelId channelId1 = Mockito.mock(ChannelId.class, "channelId1");
+  private final ChannelId channelId2 = Mockito.mock(ChannelId.class, "channelId2");
+  private final ChannelId channelId3 = Mockito.mock(ChannelId.class, "channelId3");
+
+
   private final ChannelManagerOne2One manager = new ChannelManagerOne2One();
   private final String temail1 = "a@email.com";
   private final String device1 = "device1";
@@ -23,8 +30,16 @@ public class ChannelManagerOne2OneTest {
   private final String temail3 = "c@email.com";
   private final String device3 = "device3";
 
+  @Before
+  public void init(){
+    Mockito.when(channel1.id()).thenReturn(channelId1);
+    Mockito.when(channel2.id()).thenReturn(channelId2);
+    Mockito.when(channel3.id()).thenReturn(channelId3);
+  }
+
   @Test
   public void addSession() {
+
     Collection<Session> sessionsToDelete = manager.addSession(temail1, device1, channel1);
     assertThat(sessionsToDelete).isEmpty();
 
