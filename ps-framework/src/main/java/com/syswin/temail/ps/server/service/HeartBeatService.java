@@ -12,7 +12,7 @@ public class HeartBeatService {
   private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   public void pong(Channel channel, CDTPPacket packet) {
-    LOG.debug("Received heartbeat on channel {}", channel);
+    LOG.info("Received heartbeat on channel {}", channel);
     packet.setCommand(PONG.getCode());
     channel.writeAndFlush(packet, channel.voidPromise());
   }

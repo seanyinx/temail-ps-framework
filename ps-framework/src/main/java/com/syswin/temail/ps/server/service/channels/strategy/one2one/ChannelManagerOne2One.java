@@ -48,7 +48,7 @@ public class ChannelManagerOne2One implements ChannelManager {
   @Override
   public void removeSession(String temail, String deviceId, Channel channel) {
     //移除session时，即使通道没有再绑定任何session了，也不能关闭通道，因为可能client在切换账户
-    log.debug("Removed temail {} device {} from channel {} mapping", temail, deviceId, channel);
+    log.info("Removed temail {} device {} from channel {} mapping", temail, deviceId, channel);
     deviceChannelHolder.removeSession(temail, deviceId);
     temail2Channel.getOrDefault(temail, emptyMap()).remove(deviceId);
   }
@@ -58,7 +58,7 @@ public class ChannelManagerOne2One implements ChannelManager {
     Collection<Session> sessions = deviceChannelHolder.removeChannel(channel);
 
     removeExpiredSessions(sessions);
-    log.debug("Removed all sessions {} on channel {}", sessions, channel);
+    log.info("Removed all sessions {} on channel {}", sessions, channel);
     return sessions;
   }
 
@@ -91,7 +91,7 @@ public class ChannelManagerOne2One implements ChannelManager {
       return en.getValue();
     }).collect(
         Collectors.toList());
-    log.debug("Receiver: {} , deviceId2Channel: {} , after filetered by sender:{}, senderDeviceId:{} is : {}",
+    log.info("Receiver:{}, deviceId2Channel:{}, after filetered by sender:{}, senderDeviceId:{} is : {}",
         receiver, sampleStr(deviceId2Channel), sender, senderDeviceId, sampleStr(result));
 
     return result;

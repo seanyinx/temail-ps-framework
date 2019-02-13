@@ -51,13 +51,13 @@ public abstract class AbstractSessionService implements SessionService {
     CDTPHeader header = reqPacket.getHeader();
     loginExtAsync(reqPacket,
         respPacket -> {
-          log.debug("User {} on device {} logged in on channel {} successfully", header.getSender(), header.getDeviceId(), channel);
+          log.info("User {} on device {} logged in on channel {} successfully", header.getSender(), header.getDeviceId(), channel);
           Collection<Session> sessions = channelHolder.addSession(header.getSender(), header.getDeviceId(), channel);
           channel.writeAndFlush(respPacket, channel.voidPromise());
           return sessions;
         },
         msg -> {
-          log.debug("User {} on device {} logged in on channel {} failed", header.getSender(), header.getDeviceId(), channel);
+          log.info("User {} on device {} logged in on channel {} failed", header.getSender(), header.getDeviceId(), channel);
           channel.writeAndFlush(msg, channel.voidPromise());
         });
   }
@@ -68,16 +68,16 @@ public abstract class AbstractSessionService implements SessionService {
     String deviceId = reqPacket.getHeader().getDeviceId();
     if (hasSession(channel, temail, deviceId)) {
       // 已经构建会话
-      log.debug("Skip binding because user {} on device {} is already connected on channel {}", temail, deviceId, channel);
+      log.info("Skip binding because user {} on device {} is already connected on channel {}", temail, deviceId, channel);
       return;
     }
     loginExtAsync(reqPacket,
         respPacket -> {
-          log.debug("User {} on device {} bound to channel {} successfully", temail, deviceId, channel);
+          log.info("User {} on device {} bound to channel {} successfully", temail, deviceId, channel);
           return channelHolder.addSession(temail, deviceId, channel);
         },
         respPacket -> {
-          log.debug("User {} on device {} bound to channel {} failed", temail, deviceId, channel);
+          log.info("User {} on device {} bound to channel {} failed", temail, deviceId, channel);
           // 自动绑定操作，登录失败不需要处理
         });
   }
@@ -89,13 +89,13 @@ public abstract class AbstractSessionService implements SessionService {
     CDTPPacket respPacket = new CDTPPacket(packet);
     logoutExt(packet, respPacket);
     channel.writeAndFlush(respPacket, channel.voidPromise());
-    log.debug("User {} on device {} logged out on channel {} successfully", header.getSender(), header.getDeviceId(), channel);
+    log.info("User {} on device {} logged out on channel {} successfully", header.getSender(), header.getDeviceId(), channel);
   }
 
   @Override
   public final void disconnect(Channel channel) {
     Collection<Session> sessions = channelHolder.removeChannel(channel);
-    log.debug("Removed sessions {} on closing channel {}", sessions.toString(), channel);
+    log.info("Removed sessions {} on closing channel {}", sessions.toString(), channel);
     disconnectExt(sessions);
   }
 

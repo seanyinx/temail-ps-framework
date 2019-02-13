@@ -32,7 +32,7 @@ class DeviceChannelHolder {
       Session session = currentBinder.addSession(temail, deviceId);
       channelDevIdMap.put(channel, deviceId);
       existingChannelHandler.accept(channel, session);
-      log.debug("Added temail {} device {} channel {} mapping", temail, deviceId, channel);
+      log.info("Added temail {} device {} channel {} mapping", temail, deviceId, channel);
       return Collections.emptyList();
     }
 
