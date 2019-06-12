@@ -9,6 +9,7 @@
     <module>ps-protocol</module>
     <module>ps-protocol-java</module>
     <module>ps-framework</module>
+    <module>coverage-aggregate</module>
   </modules>
   <packaging>pom</packaging>
 
@@ -17,6 +18,7 @@
     <awaitility.version>3.0.0</awaitility.version>
     <unit-scaffolding.version>1.0.0</unit-scaffolding.version>
     <netty.version>4.1.27.Final</netty.version>
+    <sonar.coverage.jacoco.xmlReportPaths>${user.dir}/coverage-aggregate/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
   </properties>
 
   <scm>
@@ -182,6 +184,45 @@
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.7.8</version>
+        <executions>
+          <execution>
+            <id>default-prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+            <configuration>
+              <destFile>${project.build.directory}/jacoco.exec</destFile>
+            </configuration>
+          </execution>
+          <execution>
+            <id>default-prepare-agent-integration</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>prepare-agent-integration</goal>
+            </goals>
+            <configuration>
+              <destFile>${project.build.directory}/jacoco-it.exec</destFile>
+              <propertyName>jacoco.failsafe.argLine</propertyName>
+            </configuration>
+          </execution>
+          <execution>
+            <id>default-report</id>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-report-integration</id>
+            <goals>
+              <goal>report-integration</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
